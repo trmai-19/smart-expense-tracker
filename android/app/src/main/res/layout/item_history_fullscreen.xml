@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Locket-style History Timeline Card:
+  - Exact 3:4 Rounded Photo Card with in-photo Caption Pill (Matches Camera Viewfinder 1:1)
+  - Top spacing matching Camera page 0
+  - Below Card:
+      1. Avatar + Username (Tên người dùng) enlarged and placed right under the photo card (Locket standard)
+      2. Single Combined Info Line: "Ăn uống · Hôm nay lúc 12:30 · 50.000 ₫" centered in the space between Avatar/Username and Bottom Bar
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:paddingStart="@dimen/spacing_lg"
+    android:paddingTop="12dp"
+    android:paddingEnd="@dimen/spacing_lg"
+    android:paddingBottom="@dimen/spacing_xs">
+
+    <!-- 3:4 Photo Card (Locket Style - Identical dimension ratio, corner radius & top spacing to Viewfinder) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_history_photo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:cardBackgroundColor="@color/bg_surface"
+        app:cardCornerRadius="@dimen/corner_camera"
+        app:cardElevation="0dp"
+        app:layout_constraintDimensionRatio="H,3:4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/input_border"
+        app:strokeWidth="1.5dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Photo -->
+            <ImageView
+                android:id="@+id/iv_fullscreen_photo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/bg_surface"
+                android:contentDescription="Ảnh chi tiêu"
+                android:scaleType="centerCrop" />
+
+            <!-- Bottom gradient scrim on photo -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_gravity="bottom"
+                android:background="@drawable/bg_locket_scrim" />
+
+            <!-- Caption Pill on photo (Locket style) -->
+            <TextView
+                android:id="@+id/tv_fullscreen_caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_marginEnd="@dimen/spacing_md"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:background="@drawable/bg_caption_overlay"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:paddingStart="14dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="8dp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold"
+                tools:text="Tô bún bò huế 50k nhé 🍜" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 1. Centered Avatar + Username (Enlarged and placed tight right under the Photo Card) -->
+    <LinearLayout
+        android:id="@+id/layout_user_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/card_history_photo">
+
+        <ImageView
+            android:id="@+id/iv_sender_avatar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_circle_avatar"
+            android:contentDescription="@null"
+            android:padding="5dp"
+            android:src="@drawable/ic_logo_set" />
+
+        <TextView
+            android:id="@+id/tv_sender_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:textColor="@color/text_primary"
+            android:textSize="16.5sp"
+            android:textStyle="bold"
+            tools:text="Nguyễn Văn A" />
+    </LinearLayout>
+
+    <!-- 2. Single Combined Info Line (Centered vertically in the space between Avatar/Username and Bottom) -->
+    <TextView
+        android:id="@+id/tv_combined_expense_info"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_user_header"
+        tools:text="Ăn uống  ·  Hôm nay lúc 12:30  ·  50.000 ₫" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

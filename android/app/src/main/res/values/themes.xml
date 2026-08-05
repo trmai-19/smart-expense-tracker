@@ -1,0 +1,25 @@
+<resources>
+    <!-- Base application theme: Pure Dark Mode by default -->
+    <style name="Theme.SmartExpenseTracker" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/primary_accent</item>
+        <item name="colorPrimaryVariant">@color/primary_accent_variant</item>
+        <item name="colorOnPrimary">@color/on_primary_accent</item>
+
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/primary_accent</item>
+        <item name="colorSecondaryVariant">@color/primary_accent_variant</item>
+        <item name="colorOnSecondary">@color/on_primary_accent</item>
+
+        <!-- Backgrounds -->
+        <item name="android:windowBackground">@color/bg_main</item>
+        <item name="android:colorBackground">@color/bg_main</item>
+        <item name="colorSurface">@color/bg_surface</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+
+        <!-- Status bar and navigation bar (pure dark) -->
+        <item name="android:statusBarColor">@color/bg_main</item>
+        <item name="android:navigationBarColor">@color/bg_main</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

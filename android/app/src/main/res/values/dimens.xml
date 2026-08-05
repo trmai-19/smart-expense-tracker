@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_xxs">4dp</dimen>
+    <dimen name="spacing_xs">8dp</dimen>
+    <dimen name="spacing_sm">12dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Corner Radius -->
+    <dimen name="corner_sm">8dp</dimen>
+    <dimen name="corner_md">16dp</dimen>
+    <dimen name="corner_lg">24dp</dimen>
+    <dimen name="corner_camera">28dp</dimen>
+    <dimen name="corner_full">999dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="text_xs">12sp</dimen>
+    <dimen name="text_sm">14sp</dimen>
+    <dimen name="text_md">16sp</dimen>
+    <dimen name="text_lg">20sp</dimen>
+    <dimen name="text_xl">24sp</dimen>
+    <dimen name="text_xxl">32sp</dimen>
+
+    <!-- UI Elements Sizes -->
+    <dimen name="shutter_size_outer">76dp</dimen>
+    <dimen name="shutter_size_inner">62dp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
+    <dimen name="avatar_size_top">40dp</dimen>
+    <dimen name="avatar_size_large">88dp</dimen>
+    <dimen name="color_swatch_size">36dp</dimen>
+    <dimen name="bottom_nav_height">64dp</dimen>
+</resources>

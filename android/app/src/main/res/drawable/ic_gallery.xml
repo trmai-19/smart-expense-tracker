@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Modern sleek gallery / image icon (iOS/Locket style) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M19,3H5C3.9,3 3,3.9 3,5v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2V5c0,-1.1 -0.9,-2 -2,-2zm0,16H5V5h14v14zm-5.04,-6.71l-2.75,3.54 -1.96,-2.36L6.5,17h11l-3.54,-4.71zM8.5,9.5c0.83,0 1.5,-0.67 1.5,-1.5S9.33,6.5 8.5,6.5 7,7.17 7,8s0.67,1.5 1.5,1.5z"/>
+</vector>

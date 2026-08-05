@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Locket-style Expense History Fragment:
+  Supports:
+  1. Fullscreen Timeline Mode: Vertical ViewPager2 (each page is a 3:4 rounded card)
+  2. Widget Grid Mode: 3-column photo grid widget (accessible via Pinch or grid button)
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main">
+
+    <!-- ══════════════════════════════════════════
+         1. TIMELINE MODE (Locket Single Card)
+         ══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/layout_fullscreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <!-- Vertical ViewPager2 for swipe timeline -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/vp_history_fullscreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Floating Top Bar -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingTop="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:paddingBottom="@dimen/spacing_xs">
+
+            <!-- Back button (Left -> Back to Camera) -->
+            <ImageButton
+                android:id="@+id/btn_close_fullscreen"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:background="@drawable/bg_circle_button"
+                android:contentDescription="Quay lại Camera"
+                android:src="@drawable/ic_back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Center: Filter Pill (Locket dropdown style) -->
+            <LinearLayout
+                android:id="@+id/btn_filter_dropdown"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_caption_overlay"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                app:layout_constraintBottom_toBottomOf="@id/btn_close_fullscreen"
+                app:layout_constraintEnd_toStartOf="@id/btn_toggle_grid"
+                app:layout_constraintStart_toEndOf="@id/btn_close_fullscreen"
+                app:layout_constraintTop_toTopOf="@id/btn_close_fullscreen">
+
+                <TextView
+                    android:id="@+id/tv_filter_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tất cả chi tiêu ▼"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Grid toggle button (Right -> Switch to Grid Widget Mode) -->
+            <ImageButton
+                android:id="@+id/btn_toggle_grid"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:background="@drawable/bg_circle_button"
+                android:contentDescription="Xem lưới ảnh"
+                android:padding="10dp"
+                android:src="@drawable/ic_grid_widget"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Index counter & gesture hint at bottom -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_fullscreen_index"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 / 6"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="•"
+                android:textColor="@color/text_tertiary"
+                android:textSize="@dimen/text_xs" />
+
+            <TextView
+                android:id="@+id/tv_pinch_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Chụm tay để xem lưới ảnh"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- ══════════════════════════════════════════
+         2. WIDGET GRID MODE (Locket Multi-Photo)
+         ══════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/layout_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <!-- Top Bar: Back (Left) | Title (Center) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/topbar_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingTop="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:paddingBottom="@dimen/spacing_sm">
+
+            <ImageButton
+                android:id="@+id/btn_close_grid"
+                android:layout_width="@dimen/icon_button_size"
+                android:layout_height="@dimen/icon_button_size"
+                android:background="@drawable/bg_circle_button"
+                android:contentDescription="Quay lại"
+                android:src="@drawable/ic_back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lưới ảnh chi tiêu"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_lg"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@id/btn_close_grid"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btn_close_grid" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 3-column grid RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_history_grid"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="68dp"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/spacing_xs"
+            android:paddingEnd="@dimen/spacing_xs"
+            android:paddingBottom="@dimen/spacing_lg" />
+
+        <!-- Empty state -->
+        <LinearLayout
+            android:id="@+id/layout_empty_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:alpha="0.4"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_camera_tab" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:text="@string/empty_history"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_md" />
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

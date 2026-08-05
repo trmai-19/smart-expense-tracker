@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard_tab"
+        android:title="@string/nav_dashboard" />
+    <item
+        android:id="@+id/nav_camera"
+        android:icon="@drawable/ic_camera_tab"
+        android:title="@string/nav_camera" />
+    <item
+        android:id="@+id/nav_palette"
+        android:icon="@drawable/ic_palette"
+        android:title="@string/nav_palette" />
+</menu>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/spacing_md"
+    android:layout_marginTop="@dimen/spacing_sm"
+    android:layout_marginEnd="@dimen/spacing_md"
+    android:layout_marginBottom="@dimen/spacing_md"
+    app:cardBackgroundColor="@color/bg_surface_card"
+    app:cardCornerRadius="@dimen/corner_camera"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/divider_color"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Photo Container with 3:4 Aspect Ratio -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/iv_history_photo"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/bg_surface"
+                android:contentDescription="History Photo"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_logo_set"
+                app:layout_constraintDimensionRatio="3:4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Caption Overlaid on Photo (Locket style) -->
+            <TextView
+                android:id="@+id/tv_history_caption"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_caption_overlay"
+                android:gravity="center"
+                android:text="Tô bún bò huế 50k nhé"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm"
+                app:layout_constraintBottom_toBottomOf="@id/iv_history_photo"
+                app:layout_constraintEnd_toEndOf="@id/iv_history_photo"
+                app:layout_constraintStart_toStartOf="@id/iv_history_photo" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Minimalist Info Section Below Photo -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingTop="@dimen/spacing_sm"
+            android:paddingEnd="@dimen/spacing_md"
+            android:paddingBottom="@dimen/spacing_md">
+
+            <!-- Amount -->
+            <TextView
+                android:id="@+id/tv_history_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="50.000 ₫"
+                android:textColor="@color/primary_accent"
+                android:textSize="@dimen/text_lg"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Category & Timestamp -->
+            <TextView
+                android:id="@+id/tv_history_meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Ăn uống · Hôm nay lúc 12:30"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_history_amount" />
+
+            <!-- Action Buttons: Download, Share, Delete -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:id="@+id/btn_action_download"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_circle_button"
+                    android:contentDescription="@string/action_download"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_download" />
+
+                <ImageButton
+                    android:id="@+id/btn_action_share"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="@dimen/spacing_xs"
+                    android:background="@drawable/bg_circle_button"
+                    android:contentDescription="@string/action_share"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_share" />
+
+                <ImageButton
+                    android:id="@+id/btn_action_delete"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="@dimen/spacing_xs"
+                    android:background="@drawable/bg_circle_button"
+                    android:contentDescription="@string/action_delete"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_delete" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
