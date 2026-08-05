@@ -84,3 +84,25 @@ presentation/
 | **Chỉnh sửa Hồ sơ** | `bottom_sheet_edit_profile.xml` | `EditProfileBottomSheet.java` | Đổi tên hiển thị, email, số điện thoại, chọn avatar emoji (⭐, 👑, 🚀, 🐱, 🔥...), cài đặt hạn mức chi tiêu tháng |
 | **Bảng chọn màu** | `bottom_sheet_color_palette.xml` | `ThemeColorBottomSheet.java` | Bottom Sheet chọn nhanh 8 màu Neon chủ đạo cho toàn hệ thống |
 | **Xác nhận chi tiêu** | `activity_confirm.xml` | `ConfirmActivity.java` | Xem lại ảnh 3:4 đã chụp/chọn, nhập caption đè lên ảnh, xác nhận đăng bài |
+
+---
+
+## 4. Cơ chế Đảm bảo Tương thích Đa Thiết bị & Không Lệch Form (Responsive Strategy)
+
+Nhằm đảm bảo ứng dụng **không bị lệch form, vỡ layout, tràn màn hình hoặc mất chữ** trên bất kỳ thiết bị Android nào (từ điện thoại màn hình nhỏ 16:9, màn hình siêu dài 20:9/21:9, màn hình gập Foldables, máy tính bảng Tablets cho đến các cài đặt kích thước chữ Accessibility lớn), hệ thống áp dụng bộ nguyên tắc chuẩn hóa giao diện:
+
+### 4.1. Khóa tỷ lệ khung hình 3:4 an toàn với 2 chiều Constraint
+- Sử dụng `app:layout_constraintDimensionRatio="3:4"` kết hợp đồng thời `app:layout_constrainedHeight="true"` và `app:layout_constrainedWidth="true"`.
+- Trên các màn hình ngắn (16:9), card ảnh và viewfinder tự động co tỉ lệ theo chiều cao khả dụng mà không bao giờ đẩy các nút điều khiển (Shutter, Thư viện, Lật camera) hoặc thanh tóm tắt thông tin ra ngoài màn hình.
+- Trên các màn hình dài (19.5:9, 20:9), khung 3:4 tận dụng tối đa chiều rộng và tự động giữ khoảng cách cân đối ở phần đáy.
+
+### 4.2. Chống mất chữ & Tràn nội dung (Text Overflow Protection)
+- **Tên người dùng & Header**: Thiết lập `android:maxLines="1"`, `android:ellipsize="end"` cùng giới hạn `maxWidth` linh hoạt để tên người dùng dài không đẩy tràn các biểu tượng xung quanh.
+- **Dòng thông tin chi tiêu (`Danh mục · Thời gian · Số tiền`)**: Thiết lập `android:maxLines="2"`, `android:ellipsize="end"` và `android:paddingStart/End` an toàn, căn giữa chuẩn xác, không bị cắt bớt số tiền khi người dùng tăng kích thước font hệ thống.
+- **Bong bóng chat & Thông báo**: Sử dụng `layout_width="0dp"` với `app:layout_constraintStart/End` hoặc `layout_weight="1"` giúp text tự động xuống dòng linh hoạt theo bề rộng màn hình thiết bị.
+
+### 4.3. Bảo vệ Cuộn Viewport (Scrolling & Viewport Integrity)
+- Mọi màn hình nhập liệu hoặc chi tiết (`LoginActivity`, `RegisterActivity`, `ProfileActivity`, `DashboardFragment`, `EditProfileBottomSheet`) đều được bao bọc trong `ScrollView` với thuộc tính `android:fillViewport="true"`.
+- Khi bàn phím ảo xuất hiện trên màn hình nhỏ, toàn bộ giao diện tự động cuộn mượt mà, không che khuất các ô nhập liệu hoặc nút bấm xác nhận.
+- `RecyclerView` trong các BottomSheet được cấu hình `android:layout_height="wrap_content"` và `android:nestedScrollingEnabled="true"` để hoạt động hoàn hảo trên mọi độ phân giải.
+

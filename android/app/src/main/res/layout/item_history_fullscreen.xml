@@ -26,10 +26,14 @@
         app:cardBackgroundColor="@color/bg_surface"
         app:cardCornerRadius="@dimen/corner_camera"
         app:cardElevation="0dp"
-        app:layout_constraintDimensionRatio="H,3:4"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constrainedHeight="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layout_user_header"
         app:strokeColor="@color/input_border"
         app:strokeWidth="1.5dp">
 
@@ -87,7 +91,8 @@
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/card_history_photo">
+        app:layout_constraintTop_toBottomOf="@id/card_history_photo"
+        app:layout_constraintBottom_toTopOf="@id/tv_combined_expense_info">
 
         <ImageView
             android:id="@+id/iv_sender_avatar"
@@ -103,6 +108,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="9dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:maxWidth="240dp"
             android:textColor="@color/text_primary"
             android:textSize="16.5sp"
             android:textStyle="bold"
@@ -116,7 +124,9 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:ellipsize="end"
-        android:maxLines="1"
+        android:maxLines="2"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:textColor="@color/text_secondary"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
