@@ -35,7 +35,7 @@
   2. Bấm nút Chụp Locket hoặc chọn ảnh từ Thư viện (Gallery).
   3. Chuyển sang màn hình `ConfirmActivity` xem trước ảnh.
   4. Nhập ghi chú/caption (ví dụ: "Cơm trưa văn phòng 50k") trên thanh bán trong suốt đè lên ảnh.
-  5. Nhấn nút "ĐĂNG" để lưu chi tiêu vào lịch sử.
+  5. Nhấn nút "ĐĂNG". Hệ thống sẽ gửi ảnh và caption lên AI (Gemini) để tự động phân tích ra "Danh mục" (tạo mới nếu chưa có) và "Số tiền", sau đó lưu chi tiêu vào lịch sử.
 
 ### UC04: Duyệt dòng thời gian chi tiêu (Vertical Timeline & Widget Grid)
 - **Actor**: Người dùng.
@@ -98,11 +98,11 @@
 
 ### UC09: Quản lý Hồ sơ & Thiết lập Hạn mức (Profile & Budget Settings)
 - **Actor**: Người dùng.
-- **Mô tả**: Xem thống kê chuỗi ngày streak, tổng số hóa đơn, đổi emoji avatar, tên, email và cài đặt ngân sách tháng.
+- **Mô tả**: Xem thống kê chuỗi ngày streak, tổng số hóa đơn, tải ảnh avatar từ thiết bị, đổi tên, email và cài đặt ngân sách tháng.
 - **Luồng chính**:
   1. Người dùng bấm vào Avatar ở Top Bar để mở `ProfileActivity`.
   2. Xem các chỉ số: 🔥 Chuỗi Streak, 📸 Tổng hóa đơn, 🎯 Hạn mức tháng.
   3. Bấm "Chỉnh sửa hồ sơ" để mở `EditProfileBottomSheet`.
-  4. Chọn Emoji đại diện nhanh, chỉnh sửa Tên, Email, SĐT và Hạn mức chi tiêu tháng.
+  4. Tải ảnh đại diện từ điện thoại, chỉnh sửa Tên, Email, SĐT và Hạn mức chi tiêu tháng.
   5. Bấm "Lưu thay đổi" để cập nhật dữ liệu vào `UserManager`.
   6. Ngoài ra có thể sao chép Mã kết nối bạn bè `SET-8899` hoặc Đăng xuất khỏi tài khoản.

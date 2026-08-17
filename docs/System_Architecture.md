@@ -100,7 +100,7 @@ android/app/src/main/java/com/smartexpense/android/
     │   └── NotificationItem.java        Model thông báo hệ thống
     ├── profile/
     │   ├── ProfileActivity.java         Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách
-    │   └── EditProfileBottomSheet.java  Modal đổi avatar emoji, tên, email, hạn mức tháng
+    │   └── EditProfileBottomSheet.java  Modal đổi ảnh avatar, tên, email, hạn mức tháng
     ├── main/
     │   ├── MainActivity.java            Host Activity điều phối Top bar, ViewPager2, Bottom bar
     │   └── MainPagerAdapter.java       Adapter 4 tab [Widget | Dashboard | Camera | Chat]

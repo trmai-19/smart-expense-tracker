@@ -79,10 +79,10 @@
 
 ### 2.5. Luồng Hồ sơ & Chỉnh sửa Cá nhân (Profile & Edit Profile Flow)
 1. Tại Top Bar của `MainActivity`, nhấn vào **Avatar**:
-   - Mở `ProfileActivity` hiển thị thông tin người dùng, huy hiệu emoji, các chỉ số thống kê (🔥 Chuỗi ngày Streak, 📸 Tổng hóa đơn, 🎯 Hạn mức chi tiêu tháng).
+   - Mở `ProfileActivity` hiển thị thông tin người dùng, ảnh đại diện, các chỉ số thống kê (🔥 Chuỗi ngày Streak, 📸 Tổng hóa đơn, 🎯 Hạn mức chi tiêu tháng).
 2. **Chỉnh sửa Hồ sơ**:
    - Nhấn vào Avatar hoặc nút *"Chỉnh sửa hồ sơ"*: Mở `EditProfileBottomSheet`.
-   - Chọn Emoji đại diện nhanh (⭐, 👑, 🚀, 🐱, 🔥...), nhập Tên mới, Email, SĐT, Hạn mức tháng.
+   - Tải ảnh đại diện (avatar) từ thiết bị, nhập Tên mới, Email, SĐT, Hạn mức tháng.
    - Bấm *"LƯU THAY ĐỔI"*: Dữ liệu cập nhật ngay tức thì vào `UserManager` và đồng bộ trên toàn ứng dụng.
 3. **Các tính năng phụ**:
    - Nhấn *"Bạn bè & Chia sẻ"*: Xem mã kết nối `SET-8899` và sao chép mã nhanh vào Clipboard.

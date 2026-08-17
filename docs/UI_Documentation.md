@@ -53,7 +53,7 @@ presentation/
 │   └── NotificationAdapter.java   # Adapter thẻ thông báo phân loại màu sắc
 ├── profile/
 │   ├── ProfileActivity.java       # Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách, menu chức năng
-│   └── EditProfileBottomSheet.java# Bottom sheet đổi tên, email, avatar emoji, hạn mức tháng
+│   └── EditProfileBottomSheet.java# Bottom sheet đổi tên, email, tải ảnh avatar, hạn mức tháng
 ├── history/
 │   ├── HistoryFullscreenAdapter.java # Adapter xem lại lịch sử chi tiết
 │   └── ExpenseHistoryItem.java    # Model dữ liệu item lịch sử
@@ -62,7 +62,7 @@ presentation/
 │   └── MainPagerAdapter.java     # Adapter 4 tab: [0: Widget | 1: Dashboard | 2: Camera | 3: Chat]
 └── util/
     ├── ThemeManager.java          # Quản lý & áp dụng Accent Color động
-    ├── UserManager.java           # Lưu trữ tên, email, avatar emoji, hạn mức ngân sách tháng
+    ├── UserManager.java           # Lưu trữ tên, email, URL ảnh avatar, hạn mức ngân sách tháng
     └── ThemeColorBottomSheet.java # Modal bảng màu Neon cá nhân hóa
 ```
 
@@ -81,7 +81,7 @@ presentation/
 | **Tab 3: Trợ lý AI SET** | `fragment_chat.xml`, `item_chat_message.xml` | `ChatFragment.java`, `ChatAdapter.java` | Nhắn tin tư vấn tài chính, nền tin nhắn người dùng đổi theo theme, tự động ẩn bottom bar khi mở bàn phím |
 | **Bảng Thông báo** | `bottom_sheet_notifications.xml`, `item_notification.xml` | `NotificationBottomSheet.java`, `NotificationAdapter.java` | Danh sách thông báo (Cảnh báo hạn mức, Lời khuyên AI, Nhắc nhở, Báo cáo), nút Đọc tất cả, chuyển tab thông minh khi chạm |
 | **Hồ sơ Cá nhân** | `activity_profile.xml` | `ProfileActivity.java` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất |
-| **Chỉnh sửa Hồ sơ** | `bottom_sheet_edit_profile.xml` | `EditProfileBottomSheet.java` | Đổi tên hiển thị, email, số điện thoại, chọn avatar emoji (⭐, 👑, 🚀, 🐱, 🔥...), cài đặt hạn mức chi tiêu tháng |
+| **Chỉnh sửa Hồ sơ** | `bottom_sheet_edit_profile.xml` | `EditProfileBottomSheet.java` | Đổi tên hiển thị, email, số điện thoại, tải ảnh đại diện từ thiết bị, cài đặt hạn mức chi tiêu tháng |
 | **Bảng chọn màu** | `bottom_sheet_color_palette.xml` | `ThemeColorBottomSheet.java` | Bottom Sheet chọn nhanh 8 màu Neon chủ đạo cho toàn hệ thống |
 | **Xác nhận chi tiêu** | `activity_confirm.xml` | `ConfirmActivity.java` | Xem lại ảnh 3:4 đã chụp/chọn, nhập caption đè lên ảnh, xác nhận đăng bài |
 
