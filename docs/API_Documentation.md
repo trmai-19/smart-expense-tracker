@@ -20,10 +20,19 @@
 
 ---
 
-## Auth API
+## 1. Auth API
+- `POST /api/auth/register`: Đăng ký tài khoản mới (Body: `email`, `password`, `displayName`). Trả về JWT Token và User Info.
+- `POST /api/auth/login`: Đăng nhập (Body: `email`, `password`). Trả về JWT Token và User Info.
 
-_Chưa triển khai. Cập nhật khi hoàn thành._
+## 2. User API
+- `GET /api/users/me`: Lấy thông tin hồ sơ cá nhân của user đang đăng nhập (Yêu cầu JWT Token).
+- `PUT /api/users/me`: Cập nhật thông tin hồ sơ (Body tuỳ chọn: `displayName`, `avatarUrl`, `monthlyBudget`, `themeColor`) (Yêu cầu JWT Token).
 
-## Expense API
+## 3. Expense API
+- `GET /api/expenses`: Lấy danh sách lịch sử chi tiêu, sắp xếp từ mới đến cũ (Yêu cầu JWT Token).
+- `POST /api/expenses`: Tạo mới một hoá đơn chi tiêu cơ bản (Body: `amount`, `category`, `photoUrl`, `caption`, `expenseDate`) (Yêu cầu JWT Token).
 
-_Chưa triển khai. Cập nhật khi hoàn thành._
+## 4. Notification API
+- `GET /api/notifications`: Lấy danh sách thông báo của user, sắp xếp từ mới đến cũ (Yêu cầu JWT Token).
+- `PATCH /api/notifications/{id}/read`: Đánh dấu một thông báo cụ thể là "Đã đọc" (Yêu cầu JWT Token).
+- `PATCH /api/notifications/read-all`: Đánh dấu tất cả thông báo của user là "Đã đọc" (Yêu cầu JWT Token).

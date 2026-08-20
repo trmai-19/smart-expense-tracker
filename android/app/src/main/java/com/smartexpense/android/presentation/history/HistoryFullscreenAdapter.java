@@ -13,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.smartexpense.android.databinding.ItemHistoryFullscreenBinding;
 import com.smartexpense.android.presentation.util.ThemeManager;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import android.graphics.drawable.ColorDrawable;
 import java.util.List;
 
 public class HistoryFullscreenAdapter extends RecyclerView.Adapter<HistoryFullscreenAdapter.ViewHolder> {
@@ -57,8 +60,19 @@ public class HistoryFullscreenAdapter extends RecyclerView.Adapter<HistoryFullsc
             // Distinct background placeholder color
             int[] darkBgColors = {0xFF1A1A2E, 0xFF16213E, 0xFF0F3460, 0xFF1B1B2F, 0xFF2C2C54, 0xFF1E1E3F};
             int colorIndex = Math.abs(item.getId().hashCode()) % darkBgColors.length;
-            binding.ivFullscreenPhoto.setBackgroundColor(darkBgColors[colorIndex]);
-            binding.ivFullscreenPhoto.setImageDrawable(null);
+            
+            if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
+                Glide.with(context)
+                     .load(item.getImageUri())
+                     .placeholder(new ColorDrawable(darkBgColors[colorIndex]))
+                     .error(new ColorDrawable(darkBgColors[colorIndex]))
+                     .transition(DrawableTransitionOptions.withCrossFade())
+                     .centerCrop()
+                     .into(binding.ivFullscreenPhoto);
+            } else {
+                binding.ivFullscreenPhoto.setBackgroundColor(darkBgColors[colorIndex]);
+                binding.ivFullscreenPhoto.setImageDrawable(null);
+            }
 
             // Caption pill on photo
             binding.tvFullscreenCaption.setText(item.getCaption());

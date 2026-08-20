@@ -21,6 +21,10 @@ import com.smartexpense.android.databinding.FragmentHistoryBinding;
 import com.smartexpense.android.presentation.util.ThemeManager;
 import java.util.ArrayList;
 import java.util.List;
+import androidx.lifecycle.ViewModelProvider;
+import com.smartexpense.android.data.remote.dto.response.ExpenseResponseDto;
+import com.smartexpense.android.di.ViewModelFactory;
+import com.smartexpense.android.presentation.history.ExpenseViewModel;
 
 public class HistoryFragment extends Fragment {
 
@@ -32,9 +36,11 @@ public class HistoryFragment extends Fragment {
     private List<ExpenseHistoryItem> allItems;
     private List<ExpenseHistoryItem> filteredItems;
 
+    private ExpenseViewModel viewModel;
+
     private ScaleGestureDetector scaleGestureDetector;
     private boolean isGridMode = false;
-    private String selectedCategory = "Tất cả";
+    private String selectedCategory = "Táº¥t cáº£";
 
     public interface OnCloseHistoryListener {
         void onCloseHistory();
@@ -65,8 +71,32 @@ public class HistoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        allItems = createSampleData();
-        filteredItems = new ArrayList<>(allItems);
+        allItems = new ArrayList<>();
+        filteredItems = new ArrayList<>();
+
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ExpenseViewModel.class);
+        viewModel.getExpenses().observe(getViewLifecycleOwner(), expenses -> {
+            if (expenses != null) {
+                allItems.clear();
+                for (ExpenseResponseDto dto : expenses) {
+                    String amountStr = String.format("%,.0f đ", dto.getAmount());
+                    String formattedDate = dto.getExpenseDate();
+                    try {
+                        java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+                        java.util.Date date = inputFormat.parse(dto.getExpenseDate());
+                        if (date != null) {
+                            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd/MM/yyyy 'lúc' HH:mm", new java.util.Locale("vi", "VN"));
+                            formattedDate = outputFormat.format(date);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    allItems.add(new ExpenseHistoryItem(dto.getId(), dto.getCaption(), amountStr, dto.getCategory(), formattedDate, dto.getPhotoUrl()));
+                }
+                filterData(selectedCategory);
+            }
+        });
+        viewModel.fetchExpenses();
 
         setupFullscreenPager();
         setupGridView();
@@ -82,9 +112,9 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Setup
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private void setupFullscreenPager() {
         fullscreenAdapter = new HistoryFullscreenAdapter(requireContext(), filteredItems);
@@ -150,12 +180,12 @@ public class HistoryFragment extends Fragment {
     }
 
     private void showCategoryFilterDialog() {
-        String[] categories = {"Tất cả", "Ăn uống", "Di chuyển", "Mua sắm", "Hóa đơn", "Giải trí"};
+        String[] categories = {"Táº¥t cáº£", "Ä‚n uá»‘ng", "Di chuyá»ƒn", "Mua sáº¯m", "HÃ³a Ä‘Æ¡n", "Giáº£i trÃ­"};
         new AlertDialog.Builder(requireContext())
-                .setTitle("Lọc danh mục chi tiêu")
+                .setTitle("Lá»c danh má»¥c chi tiÃªu")
                 .setItems(categories, (dialog, which) -> {
                     selectedCategory = categories[which];
-                    binding.tvFilterTitle.setText(selectedCategory + " ▼");
+                    binding.tvFilterTitle.setText(selectedCategory + " â–¼");
                     filterData(selectedCategory);
                 })
                 .show();
@@ -163,7 +193,7 @@ public class HistoryFragment extends Fragment {
 
     private void filterData(String category) {
         filteredItems.clear();
-        if ("Tất cả".equals(category)) {
+        if ("Táº¥t cáº£".equals(category)) {
             filteredItems.addAll(allItems);
         } else {
             for (ExpenseHistoryItem item : allItems) {
@@ -188,9 +218,9 @@ public class HistoryFragment extends Fragment {
         }
     }
 
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Mode Switching: Fullscreen <-> Grid
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     public void showFullscreen(int startPosition) {
         isGridMode = false;
@@ -259,18 +289,18 @@ public class HistoryFragment extends Fragment {
         binding.tvPinchHint.setTextColor(accentColor);
     }
 
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Sample Data
-    // ─────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     private List<ExpenseHistoryItem> createSampleData() {
         List<ExpenseHistoryItem> list = new ArrayList<>();
-        list.add(new ExpenseHistoryItem("1", "Tô bún bò huế 50k nhé 🍜", "50.000 ₫", "Ăn uống", "Hôm nay lúc 12:30", null));
-        list.add(new ExpenseHistoryItem("2", "Cà phê sữa đá sáng nay ☕", "25.000 ₫", "Ăn uống", "Hôm nay lúc 08:15", null));
-        list.add(new ExpenseHistoryItem("3", "Đổ xăng xe máy Petrolimex 🛵", "70.000 ₫", "Di chuyển", "Hôm qua lúc 17:45", null));
-        list.add(new ExpenseHistoryItem("4", "Mua áo phông Uniqlo 👕", "199.000 ₫", "Mua sắm", "2 ngày trước", null));
-        list.add(new ExpenseHistoryItem("5", "Grab đi siêu thị 🚗", "35.000 ₫", "Di chuyển", "2 ngày trước", null));
-        list.add(new ExpenseHistoryItem("6", "Bữa trưa văn phòng 🍱", "45.000 ₫", "Ăn uống", "3 ngày trước", null));
+        list.add(new ExpenseHistoryItem("1", "TÃ´ bÃºn bÃ² huáº¿ 50k nhÃ© ðŸœ", "50.000 â‚«", "Ä‚n uá»‘ng", "HÃ´m nay lÃºc 12:30", null));
+        list.add(new ExpenseHistoryItem("2", "CÃ  phÃª sá»¯a Ä‘Ã¡ sÃ¡ng nay â˜•", "25.000 â‚«", "Ä‚n uá»‘ng", "HÃ´m nay lÃºc 08:15", null));
+        list.add(new ExpenseHistoryItem("3", "Äá»• xÄƒng xe mÃ¡y Petrolimex ðŸ›µ", "70.000 â‚«", "Di chuyá»ƒn", "HÃ´m qua lÃºc 17:45", null));
+        list.add(new ExpenseHistoryItem("4", "Mua Ã¡o phÃ´ng Uniqlo ðŸ‘•", "199.000 â‚«", "Mua sáº¯m", "2 ngÃ y trÆ°á»›c", null));
+        list.add(new ExpenseHistoryItem("5", "Grab Ä‘i siÃªu thá»‹ ðŸš—", "35.000 â‚«", "Di chuyá»ƒn", "2 ngÃ y trÆ°á»›c", null));
+        list.add(new ExpenseHistoryItem("6", "Bá»¯a trÆ°a vÄƒn phÃ²ng ðŸ±", "45.000 â‚«", "Ä‚n uá»‘ng", "3 ngÃ y trÆ°á»›c", null));
         return list;
     }
 
@@ -280,3 +310,4 @@ public class HistoryFragment extends Fragment {
         binding = null;
     }
 }
+

@@ -136,8 +136,19 @@ public class TimelineFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             // Distinct background placeholder color
             int[] darkBgColors = {0xFF1A1A2E, 0xFF16213E, 0xFF0F3460, 0xFF1B1B2F, 0xFF2C2C54, 0xFF1E1E3F};
             int colorIndex = Math.abs(item.getId().hashCode()) % darkBgColors.length;
-            binding.ivFullscreenPhoto.setBackgroundColor(darkBgColors[colorIndex]);
-            binding.ivFullscreenPhoto.setImageDrawable(null);
+            
+            if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
+                com.bumptech.glide.Glide.with(context)
+                     .load(item.getImageUri())
+                     .placeholder(new android.graphics.drawable.ColorDrawable(darkBgColors[colorIndex]))
+                     .error(new android.graphics.drawable.ColorDrawable(darkBgColors[colorIndex]))
+                     .transition(com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade())
+                     .centerCrop()
+                     .into(binding.ivFullscreenPhoto);
+            } else {
+                binding.ivFullscreenPhoto.setBackgroundColor(darkBgColors[colorIndex]);
+                binding.ivFullscreenPhoto.setImageDrawable(null);
+            }
 
             // Caption pill on photo
             binding.tvFullscreenCaption.setText(item.getCaption());

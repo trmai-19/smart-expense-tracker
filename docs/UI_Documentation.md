@@ -75,12 +75,12 @@ presentation/
 | **Đăng nhập** | `activity_login.xml` | `LoginActivity.java` | Tên app "Smart Expense Tracker", form đăng nhập, hiệu ứng chuyển cảnh mượt mà |
 | **Đăng ký** | `activity_register.xml` | `RegisterActivity.java` | Form tạo tài khoản, xác nhận mật khẩu, đồng bộ tên hiển thị ban đầu |
 | **Màn hình chính (Host)** | `activity_main.xml` | `MainActivity.java` | Top bar (Avatar, Tên app/Bộ lọc, Chuông thông báo + Red badge), ViewPager2 4 tab ngang, Bottom bar 5 slot |
-| **Tab 0: Lưới Widget** | `fragment_widget_grid.xml` | `WidgetGridFragment.java` | Lưới ảnh widget chi tiêu 3:4 phong cách Locket, xem lại ảnh, lọc danh mục |
+| **Tab 0: Lưới Widget** | `fragment_widget_grid.xml` | `WidgetGridFragment.java` | Lưới ảnh widget chi tiêu 3:4 phong cách Locket (Dùng `Glide` tải ảnh & đồng bộ API thật), xem lại ảnh, lọc danh mục |
 | **Tab 1: Thống kê** | `fragment_dashboard.xml` | `DashboardFragment.java` | Tổng chi tiêu, phân bổ %, biểu đồ 7 cột, bộ lọc khoảng ngày linh hoạt |
-| **Tab 2: Camera & Timeline** | `fragment_camera.xml`, `item_feed_camera.xml`, `item_history_fullscreen.xml` | `CameraFragment.java`, `TimelineFeedAdapter.java` | Trang 0: Camera preview 3:4 + nút chụp Locket viền đôi; Trang 1..N: Cuộn dọc xem từng chi tiêu kèm tên người dùng và avatar viền accent |
+| **Tab 2: Camera & Timeline** | `fragment_camera.xml`, `item_feed_camera.xml`, `item_history_fullscreen.xml` | `CameraFragment.java`, `TimelineFeedAdapter.java` | Trang 0: Camera preview 3:4 + nút chụp Locket viền đôi; Trang 1..N: Cuộn dọc xem từng chi tiêu (Tải ảnh `Glide`, định dạng ngày giờ Việt Nam) kèm tên người dùng và avatar viền accent |
 | **Tab 3: Trợ lý AI SET** | `fragment_chat.xml`, `item_chat_message.xml` | `ChatFragment.java`, `ChatAdapter.java` | Nhắn tin tư vấn tài chính, nền tin nhắn người dùng đổi theo theme, tự động ẩn bottom bar khi mở bàn phím |
 | **Bảng Thông báo** | `bottom_sheet_notifications.xml`, `item_notification.xml` | `NotificationBottomSheet.java`, `NotificationAdapter.java` | Danh sách thông báo (Cảnh báo hạn mức, Lời khuyên AI, Nhắc nhở, Báo cáo), nút Đọc tất cả, chuyển tab thông minh khi chạm |
-| **Hồ sơ Cá nhân** | `activity_profile.xml` | `ProfileActivity.java` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất |
+| **Hồ sơ Cá nhân** | `activity_profile.xml` | `ProfileActivity.java` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất (Đảm bảo bảng mã UTF-8 chống lỗi font) |
 | **Chỉnh sửa Hồ sơ** | `bottom_sheet_edit_profile.xml` | `EditProfileBottomSheet.java` | Đổi tên hiển thị, email, số điện thoại, tải ảnh đại diện từ thiết bị, cài đặt hạn mức chi tiêu tháng |
 | **Bảng chọn màu** | `bottom_sheet_color_palette.xml` | `ThemeColorBottomSheet.java` | Bottom Sheet chọn nhanh 8 màu Neon chủ đạo cho toàn hệ thống |
 | **Xác nhận chi tiêu** | `activity_confirm.xml` | `ConfirmActivity.java` | Xem lại ảnh 3:4 đã chụp/chọn, nhập caption đè lên ảnh, xác nhận đăng bài |

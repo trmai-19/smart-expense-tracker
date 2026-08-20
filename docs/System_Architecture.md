@@ -165,3 +165,16 @@ server/src/main/java/com/smartexpense/api/
 | Activity/Fragment | — | `presentation/{feature}/` |
 | ViewModel / Adapter | — | `presentation/{feature}/` |
 | State Manager / Util | — | `presentation/util/` |
+
+---
+
+## 6. Luồng xử lý Hình ảnh (Image & Media Pipeline) - Giai đoạn hiện tại
+
+Để đảm bảo tốc độ và giảm thiểu tài nguyên trong giai đoạn phát triển ban đầu, hệ thống xử lý ảnh theo kiến trúc **Local URI Caching**:
+
+1. **Chụp ảnh (Android)**: `CameraFragment` dùng CameraX chụp ảnh và lưu trực tiếp vào thư mục bộ nhớ đệm (cache) của ứng dụng (`/data/user/0/.../cache/`).
+2. **Giao tiếp (API)**: Ứng dụng gửi trực tiếp chuỗi định vị file nội bộ (vd: `file:///data/user/0/.../cache/img.jpg`) qua API cho Spring Boot Backend.
+3. **Lưu trữ (Backend)**: Database PostgreSQL lưu trữ chuỗi `file://` này vào cột `photo_url` dưới dạng văn bản (text). Server không thực sự lưu trữ file ảnh vật lý.
+4. **Hiển thị (Glide)**: Khi người dùng lướt xem lịch sử chi tiêu, API trả về chuỗi `file://`. Thư viện `Glide` trên Android nhận diện chuỗi này và tự động tải ảnh từ bộ nhớ đệm nội bộ để hiển thị lên UI (`HistoryFullscreenAdapter`, `HistoryGridAdapter`, `TimelineFeedAdapter`).
+
+*Lưu ý kiến trúc: Cách tiếp cận này chỉ hoạt động khi xem ảnh trên cùng một thiết bị đã chụp ảnh. Kiến trúc này sẽ được nâng cấp lên luồng Multipart Upload hoặc Cloud Storage (AWS S3/Firebase) trong tương lai.*

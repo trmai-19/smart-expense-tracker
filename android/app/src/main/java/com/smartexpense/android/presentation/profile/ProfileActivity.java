@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import androidx.lifecycle.ViewModelProvider;
+import com.smartexpense.android.di.ViewModelFactory;
+import com.smartexpense.android.presentation.profile.ProfileViewModel;
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +20,7 @@ import com.smartexpense.android.presentation.util.UserManager;
 public class ProfileActivity extends AppCompatActivity {
 
     private ActivityProfileBinding binding;
+    private ProfileViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +29,21 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         loadUserProfile();
+
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ProfileViewModel.class);
+        viewModel.getUserProfile().observe(this, profile -> {
+            if (profile != null) {
+                binding.tvUserName.setText(profile.getDisplayName());
+                binding.tvUserEmail.setText(profile.getEmail());
+                binding.tvStatStreak.setText(profile.getStreakDays() + " ngày");
+                binding.tvStatBudget.setText(UserManager.formatCurrency((long) profile.getMonthlyBudget()));
+                
+                // Update local storage
+                UserManager.setUserName(this, profile.getDisplayName());
+                UserManager.setMonthlyBudget(this, (long) profile.getMonthlyBudget());
+            }
+        });
+        viewModel.fetchProfile();
         applyAccentColor();
         setupListeners();
     }
@@ -62,6 +81,21 @@ public class ProfileActivity extends AppCompatActivity {
             EditProfileBottomSheet bottomSheet = EditProfileBottomSheet.newInstance();
             bottomSheet.setOnProfileUpdatedListener(() -> {
                 loadUserProfile();
+
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ProfileViewModel.class);
+        viewModel.getUserProfile().observe(this, profile -> {
+            if (profile != null) {
+                binding.tvUserName.setText(profile.getDisplayName());
+                binding.tvUserEmail.setText(profile.getEmail());
+                binding.tvStatStreak.setText(profile.getStreakDays() + " ngày");
+                binding.tvStatBudget.setText(UserManager.formatCurrency((long) profile.getMonthlyBudget()));
+                
+                // Update local storage
+                UserManager.setUserName(this, profile.getDisplayName());
+                UserManager.setMonthlyBudget(this, (long) profile.getMonthlyBudget());
+            }
+        });
+        viewModel.fetchProfile();
                 applyAccentColor();
             });
             bottomSheet.show(getSupportFragmentManager(), "EditProfileBottomSheet");
@@ -119,7 +153,7 @@ public class ProfileActivity extends AppCompatActivity {
                 .setMessage("Smart Expense Tracker v1.0\n\n" +
                         "Ứng dụng quản lý tài chính thông minh phong cách Locket.\n\n" +
                         "Tính năng nổi bật:\n" +
-                        "• Chụp ảnh hóa đơn tỉ lệ 3:4\n" +
+                        "• Chụp ảnh hóa đơn tỷ lệ 3:4\n" +
                         "• Timeline lịch sử & Lưới widget trực quan\n" +
                         "• Dashboard thống kê & Lọc theo dải ngày\n" +
                         "• Trợ lý AI tư vấn tài chính thông minh\n" +

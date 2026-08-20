@@ -24,8 +24,14 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.smartexpense.android.databinding.FragmentCameraBinding;
+import com.smartexpense.android.di.ViewModelFactory;
 import com.smartexpense.android.presentation.camera.confirm.ConfirmActivity;
 import com.smartexpense.android.presentation.history.ExpenseHistoryItem;
+import com.smartexpense.android.presentation.history.ExpenseViewModel;
+import com.smartexpense.android.data.remote.dto.response.ExpenseResponseDto;
+
+import androidx.lifecycle.ViewModelProvider;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,8 +50,9 @@ public class CameraFragment extends Fragment implements TimelineFeedAdapter.Feed
     private FragmentCameraBinding binding;
     private TimelineFeedAdapter feedAdapter;
 
-    private List<ExpenseHistoryItem> allItems;
-    private List<ExpenseHistoryItem> filteredItems;
+    private List<ExpenseHistoryItem> allItems = new ArrayList<>();
+    private List<ExpenseHistoryItem> filteredItems = new ArrayList<>();
+    private ExpenseViewModel viewModel;
     private String selectedCategory = "Tất cả";
 
     private ImageCapture imageCapture;
@@ -100,11 +107,22 @@ public class CameraFragment extends Fragment implements TimelineFeedAdapter.Feed
 
         cameraExecutor = Executors.newSingleThreadExecutor();
 
-        allItems = createSampleData();
-        filteredItems = new ArrayList<>(allItems);
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ExpenseViewModel.class);
+        viewModel.getExpenses().observe(getViewLifecycleOwner(), expenses -> {
+            if (expenses != null) {
+                allItems.clear();
+                for (ExpenseResponseDto dto : expenses) {
+                    String amountStr = String.format("%,.0f đ", dto.getAmount());
+                    allItems.add(new ExpenseHistoryItem(dto.getId(), dto.getCaption(), amountStr, dto.getCategory(), dto.getExpenseDate(), dto.getPhotoUrl()));
+                }
+                filterCategory(selectedCategory);
+            }
+        });
 
         setupTimelineFeed();
         checkPermissionsAndStartCamera();
+        
+        viewModel.fetchExpenses();
     }
 
     // ─────────────────────────────────────────────
@@ -338,21 +356,7 @@ public class CameraFragment extends Fragment implements TimelineFeedAdapter.Feed
     // ─────────────────────────────────────────────
 
     private List<ExpenseHistoryItem> createSampleData() {
-        List<ExpenseHistoryItem> list = new ArrayList<>();
-        list.add(new ExpenseHistoryItem("1", "Tô bún bò huế 50k nhé 🍜", "50.000 ₫", "Ăn uống", "Hôm nay lúc 12:30", null));
-        list.add(new ExpenseHistoryItem("2", "Cà phê sữa đá sáng nay ☕", "25.000 ₫", "Ăn uống", "Hôm nay lúc 08:15", null));
-        list.add(new ExpenseHistoryItem("3", "Đổ xăng xe máy Petrolimex 🛵", "70.000 ₫", "Di chuyển", "Hôm qua lúc 17:45", null));
-        list.add(new ExpenseHistoryItem("4", "Mua áo phông Uniqlo 👕", "199.000 ₫", "Mua sắm", "2 ngày trước", null));
-        list.add(new ExpenseHistoryItem("5", "Grab đi siêu thị 🚗", "35.000 ₫", "Di chuyển", "2 ngày trước", null));
-        list.add(new ExpenseHistoryItem("6", "Bữa trưa văn phòng 🍱", "45.000 ₫", "Ăn uống", "3 ngày trước", null));
-        list.add(new ExpenseHistoryItem("7", "Tiền điện tháng này ⚡", "450.000 ₫", "Hóa đơn", "4 ngày trước", null));
-        list.add(new ExpenseHistoryItem("8", "Vé xem phim CGV cuối tuần 🎬", "120.000 ₫", "Giải trí", "5 ngày trước", null));
-        list.add(new ExpenseHistoryItem("9", "Trà sữa Koi Thé 🧋", "65.000 ₫", "Ăn uống", "6 ngày trước", null));
-        list.add(new ExpenseHistoryItem("10", "Mua sách kỹ năng mềm 📚", "135.000 ₫", "Mua sắm", "1 tuần trước", null));
-        list.add(new ExpenseHistoryItem("11", "Tiền nước sinh hoạt 💧", "85.000 ₫", "Hóa đơn", "1 tuần trước", null));
-        list.add(new ExpenseHistoryItem("12", "Cà phê boardgame cùng bạn bè 🎲", "60.000 ₫", "Giải trí", "1 tuần trước", null));
-        list.add(new ExpenseHistoryItem("13", "Bảo dưỡng thay nhớt xe 🔧", "110.000 ₫", "Di chuyển", "2 tuần trước", null));
-        return list;
+        return new ArrayList<>();
     }
 
     @Override

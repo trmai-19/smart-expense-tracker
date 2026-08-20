@@ -7,6 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.smartexpense.android.databinding.ItemHistoryGridBinding;
 import com.smartexpense.android.presentation.util.ThemeManager;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import android.graphics.drawable.ColorDrawable;
 import java.util.List;
 
 public class HistoryGridAdapter extends RecyclerView.Adapter<HistoryGridAdapter.ViewHolder> {
@@ -58,8 +61,20 @@ public class HistoryGridAdapter extends RecyclerView.Adapter<HistoryGridAdapter.
             int accentColor = ThemeManager.getAccentColorInt(context);
 
             int[] darkBgColors = {0xFF1A1A2E, 0xFF16213E, 0xFF0F3460, 0xFF1B1B2F, 0xFF2C2C54, 0xFF1E1E3F};
-            binding.ivGridPhoto.setBackgroundColor(darkBgColors[position % darkBgColors.length]);
-            binding.ivGridPhoto.setImageDrawable(null);
+            int bgColor = darkBgColors[position % darkBgColors.length];
+            
+            if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
+                Glide.with(context)
+                     .load(item.getImageUri())
+                     .placeholder(new ColorDrawable(bgColor))
+                     .error(new ColorDrawable(bgColor))
+                     .transition(DrawableTransitionOptions.withCrossFade())
+                     .centerCrop()
+                     .into(binding.ivGridPhoto);
+            } else {
+                binding.ivGridPhoto.setBackgroundColor(bgColor);
+                binding.ivGridPhoto.setImageDrawable(null);
+            }
 
             binding.tvGridCaption.setText(item.getCaption());
             binding.tvGridAmount.setText(item.getAmount());

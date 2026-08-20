@@ -6,11 +6,21 @@ import android.os.Bundle;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.smartexpense.android.databinding.ActivityConfirmBinding;
+import com.smartexpense.android.di.ViewModelFactory;
+import com.smartexpense.android.presentation.history.ExpenseViewModel;
 import com.smartexpense.android.presentation.util.ThemeManager;
+
+import androidx.lifecycle.ViewModelProvider;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ConfirmActivity extends AppCompatActivity {
 
     private ActivityConfirmBinding binding;
+    private ExpenseViewModel viewModel;
+    private String currentPhotoUrl = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,9 +28,12 @@ public class ConfirmActivity extends AppCompatActivity {
         binding = ActivityConfirmBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(ExpenseViewModel.class);
+
         applyAccentColor();
         loadCapturedImage();
         setupListeners();
+        observeViewModel();
     }
 
     private void applyAccentColor() {
@@ -34,6 +47,7 @@ public class ConfirmActivity extends AppCompatActivity {
             try {
                 Uri imageUri = Uri.parse(imageUriString);
                 binding.ivCapturedPhoto.setImageURI(imageUri);
+                currentPhotoUrl = imageUriString;
             } catch (Exception e) {
                 // Keep default placeholder
             }
@@ -49,12 +63,25 @@ public class ConfirmActivity extends AppCompatActivity {
                     ? binding.etCaption.getText().toString().trim()
                     : "";
 
-            String message = caption.isEmpty()
-                    ? "Đã ghi nhận chi tiêu thành công!"
-                    : "Đã đăng chi tiêu: \"" + caption + "\"";
+            String expenseDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
+            
+            // Hardcode amount/category for demo since UI only has caption
+            viewModel.createExpense(50000, "Ăn uống", currentPhotoUrl, caption, expenseDate);
+        });
+    }
 
-            Toast.makeText(ConfirmActivity.this, message, Toast.LENGTH_SHORT).show();
-            finish();
+    private void observeViewModel() {
+        viewModel.getCreateSuccess().observe(this, success -> {
+            if (success != null && success) {
+                Toast.makeText(ConfirmActivity.this, "Đã ghi nhận chi tiêu thành công!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+        viewModel.getError().observe(this, error -> {
+            if (error != null) {
+                Toast.makeText(ConfirmActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

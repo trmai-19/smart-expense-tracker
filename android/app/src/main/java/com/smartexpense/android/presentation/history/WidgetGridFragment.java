@@ -53,12 +53,39 @@ public class WidgetGridFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private com.smartexpense.android.presentation.history.ExpenseViewModel viewModel;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        allItems = createSampleData();
-        filteredItems = new ArrayList<>(allItems);
+        allItems = new ArrayList<>();
+        filteredItems = new ArrayList<>();
+
+        viewModel = new androidx.lifecycle.ViewModelProvider(this, com.smartexpense.android.di.ViewModelFactory.getInstance()).get(com.smartexpense.android.presentation.history.ExpenseViewModel.class);
+        viewModel.getExpenses().observe(getViewLifecycleOwner(), expenses -> {
+            if (expenses != null) {
+                allItems.clear();
+                for (com.smartexpense.android.data.remote.dto.response.ExpenseResponseDto dto : expenses) {
+                    String amountStr = String.format("%,.0f đ", dto.getAmount());
+                    String formattedDate = dto.getExpenseDate();
+                    try {
+                        java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault());
+                        java.util.Date date = inputFormat.parse(dto.getExpenseDate());
+                        if (date != null) {
+                            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd/MM/yyyy 'lúc' HH:mm", new java.util.Locale("vi", "VN"));
+                            formattedDate = outputFormat.format(date);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    allItems.add(new ExpenseHistoryItem(dto.getId(), dto.getCaption(), amountStr, dto.getCategory(), formattedDate, dto.getPhotoUrl()));
+                }
+                filterCategory(selectedCategory);
+            }
+        });
+        
+        viewModel.fetchExpenses();
 
         setupRecyclerView();
     }

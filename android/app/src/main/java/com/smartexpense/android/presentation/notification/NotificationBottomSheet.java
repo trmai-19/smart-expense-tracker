@@ -13,8 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.smartexpense.android.R;
 import com.smartexpense.android.data.model.NotificationItem;
+import com.smartexpense.android.data.remote.dto.response.NotificationResponseDto;
 import com.smartexpense.android.databinding.BottomSheetNotificationsBinding;
+import com.smartexpense.android.di.ViewModelFactory;
 import com.smartexpense.android.presentation.util.ThemeManager;
+
+import androidx.lifecycle.ViewModelProvider;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class NotificationBottomSheet extends BottomSheetDialogFragment {
@@ -29,7 +35,8 @@ public class NotificationBottomSheet extends BottomSheetDialogFragment {
 
     private BottomSheetNotificationsBinding binding;
     private NotificationAdapter adapter;
-    private List<NotificationItem> notificationList;
+    private List<NotificationItem> notificationList = new ArrayList<>();
+    private NotificationViewModel viewModel;
     private OnNotificationActionListener actionListener;
     private OnDismissListener dismissListener;
 
@@ -82,21 +89,10 @@ public class NotificationBottomSheet extends BottomSheetDialogFragment {
     }
 
     private void setupRecyclerView() {
-        notificationList = NotificationManager.getInstance().getNotifications();
-
-        if (notificationList.isEmpty()) {
-            binding.rvNotifications.setVisibility(View.GONE);
-            binding.layoutEmptyState.setVisibility(View.VISIBLE);
-            return;
-        }
-
-        binding.rvNotifications.setVisibility(View.VISIBLE);
-        binding.layoutEmptyState.setVisibility(View.GONE);
+        viewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(NotificationViewModel.class);
 
         adapter = new NotificationAdapter(requireContext(), notificationList, item -> {
-            NotificationManager.getInstance().markAsRead(item.getId());
-            updateHeaderCount();
-
+            viewModel.markAsRead(item.getId());
             if (item.getTargetTab() != null) {
                 dismiss();
                 if (actionListener != null) {
@@ -109,24 +105,42 @@ public class NotificationBottomSheet extends BottomSheetDialogFragment {
 
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvNotifications.setAdapter(adapter);
+
+        viewModel.getNotifications().observe(getViewLifecycleOwner(), notifications -> {
+            if (notifications != null) {
+                notificationList.clear();
+                for (NotificationResponseDto dto : notifications) {
+                    NotificationItem item = new NotificationItem(dto.getId(), "Thông báo từ hệ thống", dto.getContent(), dto.getCreatedAt(), NotificationItem.Type.SYSTEM, dto.getIsRead(), null);
+                    notificationList.add(item);
+                }
+                adapter.notifyDataSetChanged();
+                updateHeaderCount();
+
+                if (notificationList.isEmpty()) {
+                    binding.rvNotifications.setVisibility(View.GONE);
+                    binding.layoutEmptyState.setVisibility(View.VISIBLE);
+                } else {
+                    binding.rvNotifications.setVisibility(View.VISIBLE);
+                    binding.layoutEmptyState.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        viewModel.fetchNotifications();
     }
 
     private void setupListeners() {
         binding.btnMarkAllRead.setOnClickListener(v -> {
-            NotificationManager.getInstance().markAllAsRead();
-            for (NotificationItem item : notificationList) {
-                item.setRead(true);
-            }
-            if (adapter != null) {
-                adapter.notifyDataSetChanged();
-            }
-            updateHeaderCount();
+            viewModel.markAllAsRead();
             Toast.makeText(requireContext(), "Đã đánh dấu tất cả là đã đọc", Toast.LENGTH_SHORT).show();
         });
     }
 
     private void updateHeaderCount() {
-        int unread = NotificationManager.getInstance().getUnreadCount();
+        int unread = 0;
+        for (NotificationItem item : notificationList) {
+            if (!item.isRead()) unread++;
+        }
         if (unread > 0) {
             binding.tvSheetSubtitle.setText(unread + " thông báo chưa đọc · Cập nhật tài chính & AI");
             binding.btnMarkAllRead.setVisibility(View.VISIBLE);
