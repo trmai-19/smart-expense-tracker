@@ -29,61 +29,61 @@
 ```
 presentation/
 ├── auth/
-│   ├── login/                     # LoginActivity (Đăng nhập, branding SET, transition mượt mà)
-│   └── register/                  # RegisterActivity (Đăng ký tài khoản mới)
+│   ├── login/                     # LoginScreen.kt (Đăng nhập, branding SET, transition mượt mà)
+│   └── register/                  # RegisterScreen.kt (Đăng ký tài khoản mới)
 ├── camera/
-│   ├── CameraFragment.java        # CameraX 3:4 viewfinder, Shutter Locket, vertical swipe timeline
-│   ├── TimelineFeedAdapter.java   # Vertical feed adapter: Trang 0 là Camera Preview, Trang 1...N là lịch sử
-│   ├── LocketFeedAdapter.java     # Feed adapter tiện ích
+│   ├── CameraScreen.kt            # CameraX 3:4 viewfinder, Shutter Locket, vertical swipe timeline
+│   ├── TimelineFeed.kt            # Vertical feed UI: Trang 0 là Camera Preview, Trang 1...N là lịch sử
+│   ├── LocketFeed.kt              # Feed UI tiện ích
 │   └── confirm/
-│       └── ConfirmActivity.java    # Màn hình xác nhận ảnh + viết caption đè + nút ĐĂNG
+│       └── ConfirmScreen.kt       # Màn hình xác nhận ảnh + viết caption đè + nút ĐĂNG
 ├── widget/
-│   ├── WidgetGridFragment.java    # Tab 0: Lưới widget chi tiêu Locket
-│   └── WidgetGridAdapter.java     # Adapter lưới album chi tiêu
+│   ├── WidgetGridScreen.kt        # Tab 0: Lưới widget chi tiêu Locket
+│   └── WidgetGrid.kt              # UI lưới album chi tiêu
 ├── dashboard/
-│   ├── DashboardFragment.java     # Tab 1: Tổng chi tiêu, bộ lọc ngày từ ngày -> đến ngày, biểu đồ 7 ngày
-│   └── DateRangePickerBottomSheet # Dialog chọn khoảng ngày bắt đầu - kết thúc
+│   ├── DashboardScreen.kt         # Tab 1: Tổng chi tiêu, bộ lọc ngày, biểu đồ 7 ngày
+│   └── DateRangePickerBottomSheet.kt # Dialog chọn khoảng ngày
 ├── chat/
-│   ├── ChatFragment.java          # Tab 3: Trợ lý AI tư vấn tài chính, keyboard insets handling
-│   ├── ChatAdapter.java           # Adapter bong bóng chat (Bot surface & User theme accent bubble)
-│   └── ChatMessage.java           # Model tin nhắn chat
+│   ├── ChatScreen.kt              # Tab 3: Trợ lý AI tư vấn tài chính, keyboard insets handling
+│   ├── ChatBubble.kt              # UI bong bóng chat (Bot surface & User theme accent bubble)
+│   └── ChatMessage.kt             # Model tin nhắn chat
 ├── notification/
-│   ├── NotificationManager.java   # Quản lý dữ liệu thông báo & số lượng chưa đọc
-│   ├── NotificationBottomSheet.java # Bottom sheet danh sách thông báo & điều hướng tab
-│   └── NotificationAdapter.java   # Adapter thẻ thông báo phân loại màu sắc
+│   ├── NotificationManager.kt     # Quản lý dữ liệu thông báo & số lượng chưa đọc
+│   ├── NotificationBottomSheet.kt # Bottom sheet danh sách thông báo & điều hướng tab
+│   └── NotificationList.kt        # UI thẻ thông báo phân loại màu sắc
 ├── profile/
-│   ├── ProfileActivity.java       # Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách, menu chức năng
-│   └── EditProfileBottomSheet.java# Bottom sheet đổi tên, email, tải ảnh avatar, hạn mức tháng
+│   ├── ProfileScreen.kt           # Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách, menu chức năng
+│   └── EditProfileBottomSheet.kt  # Bottom sheet đổi tên, email, tải ảnh avatar, hạn mức tháng
 ├── history/
-│   ├── HistoryFullscreenAdapter.java # Adapter xem lại lịch sử chi tiết
-│   └── ExpenseHistoryItem.java    # Model dữ liệu item lịch sử
-├── main/
-│   ├── MainActivity.java          # Host Activity: Top bar cố định, ViewPager2 4 tab, Bottom bar 5 slot
-│   └── MainPagerAdapter.java     # Adapter 4 tab: [0: Widget | 1: Dashboard | 2: Camera | 3: Chat]
+│   ├── HistoryFullscreen.kt       # UI xem lại lịch sử chi tiết
+│   └── ExpenseHistoryItem.kt      # Model dữ liệu item lịch sử
+├── navigation/
+│   ├── AppNavHost.kt              # Host điều hướng chính: Top bar cố định, Navigation logic, Bottom bar
+│   └── Screen.kt                  # Định nghĩa các tuyến đường
 └── util/
-    ├── ThemeManager.java          # Quản lý & áp dụng Accent Color động
-    ├── UserManager.java           # Lưu trữ tên, email, URL ảnh avatar, hạn mức ngân sách tháng
-    └── ThemeColorBottomSheet.java # Modal bảng màu Neon cá nhân hóa
+    ├── ThemeManager.kt            # Quản lý & áp dụng Accent Color động
+    ├── UserManager.kt             # Lưu trữ tên, email, URL ảnh avatar, hạn mức ngân sách tháng
+    └── ThemeColorBottomSheet.kt   # Modal bảng màu Neon cá nhân hóa
 ```
 
 ---
 
 ## 3. Danh sách màn hình & Thành phần UI
 
-| Màn hình / Component | Layout XML | Controller Java | Mô tả tính năng |
-|---|---|---|---|
-| **Đăng nhập** | `activity_login.xml` | `LoginActivity.java` | Tên app "Smart Expense Tracker", form đăng nhập, hiệu ứng chuyển cảnh mượt mà |
-| **Đăng ký** | `activity_register.xml` | `RegisterActivity.java` | Form tạo tài khoản, xác nhận mật khẩu, đồng bộ tên hiển thị ban đầu |
-| **Màn hình chính (Host)** | `activity_main.xml` | `MainActivity.java` | Top bar (Avatar, Tên app/Bộ lọc, Chuông thông báo + Red badge), ViewPager2 4 tab ngang, Bottom bar 5 slot |
-| **Tab 0: Lưới Widget** | `fragment_widget_grid.xml` | `WidgetGridFragment.java` | Lưới ảnh widget chi tiêu 3:4 phong cách Locket (Dùng `Glide` tải ảnh & đồng bộ API thật), xem lại ảnh, lọc danh mục |
-| **Tab 1: Thống kê** | `fragment_dashboard.xml` | `DashboardFragment.java` | Tổng chi tiêu, phân bổ %, biểu đồ 7 cột, bộ lọc khoảng ngày linh hoạt |
-| **Tab 2: Camera & Timeline** | `fragment_camera.xml`, `item_feed_camera.xml`, `item_history_fullscreen.xml` | `CameraFragment.java`, `TimelineFeedAdapter.java` | Trang 0: Camera preview 3:4 + nút chụp Locket viền đôi; Trang 1..N: Cuộn dọc xem từng chi tiêu (Tải ảnh `Glide`, định dạng ngày giờ Việt Nam) kèm tên người dùng và avatar viền accent |
-| **Tab 3: Trợ lý AI SET** | `fragment_chat.xml`, `item_chat_message.xml` | `ChatFragment.java`, `ChatAdapter.java` | Nhắn tin tư vấn tài chính, nền tin nhắn người dùng đổi theo theme, tự động ẩn bottom bar khi mở bàn phím |
-| **Bảng Thông báo** | `bottom_sheet_notifications.xml`, `item_notification.xml` | `NotificationBottomSheet.java`, `NotificationAdapter.java` | Danh sách thông báo (Cảnh báo hạn mức, Lời khuyên AI, Nhắc nhở, Báo cáo), nút Đọc tất cả, chuyển tab thông minh khi chạm |
-| **Hồ sơ Cá nhân** | `activity_profile.xml` | `ProfileActivity.java` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất (Đảm bảo bảng mã UTF-8 chống lỗi font) |
-| **Chỉnh sửa Hồ sơ** | `bottom_sheet_edit_profile.xml` | `EditProfileBottomSheet.java` | Đổi tên hiển thị, email, số điện thoại, tải ảnh đại diện từ thiết bị, cài đặt hạn mức chi tiêu tháng |
-| **Bảng chọn màu** | `bottom_sheet_color_palette.xml` | `ThemeColorBottomSheet.java` | Bottom Sheet chọn nhanh 8 màu Neon chủ đạo cho toàn hệ thống |
-| **Xác nhận chi tiêu** | `activity_confirm.xml` | `ConfirmActivity.java` | Xem lại ảnh 3:4 đã chụp/chọn, nhập caption đè lên ảnh, xác nhận đăng bài |
+| Màn hình / Component | Compose UI | Mô tả tính năng |
+|---|---|---|
+| **Đăng nhập** | `LoginScreen.kt` | Tên app "Smart Expense Tracker", form đăng nhập, hiệu ứng chuyển cảnh mượt mà |
+| **Đăng ký** | `RegisterScreen.kt` | Form tạo tài khoản, xác nhận mật khẩu, đồng bộ tên hiển thị ban đầu |
+| **Màn hình chính (Host)** | `AppNavHost.kt` | Top bar (Avatar, Tên app/Bộ lọc, Chuông thông báo + Red badge), Navigation Host, Bottom bar 5 slot |
+| **Tab 0: Lưới Widget** | `WidgetGridScreen.kt` | Lưới ảnh widget chi tiêu 3:4 phong cách Locket (Dùng `Coil` tải ảnh & đồng bộ API thật), xem lại ảnh, lọc danh mục |
+| **Tab 1: Thống kê** | `DashboardScreen.kt` | Tổng chi tiêu, phân bổ %, biểu đồ 7 cột, bộ lọc khoảng ngày linh hoạt |
+| **Tab 2: Camera & Timeline** | `CameraScreen.kt`, `TimelineFeed.kt` | Trang 0: Camera preview 3:4 + nút chụp Locket viền đôi; Trang 1..N: Cuộn dọc xem từng chi tiêu (Tải ảnh `Coil`, định dạng ngày giờ Việt Nam) kèm tên người dùng và avatar viền accent |
+| **Tab 3: Trợ lý AI SET** | `ChatScreen.kt`, `ChatBubble.kt` | Nhắn tin tư vấn tài chính, nền tin nhắn người dùng đổi theo theme, tự động ẩn bottom bar khi mở bàn phím |
+| **Bảng Thông báo** | `NotificationBottomSheet.kt` | Danh sách thông báo (Cảnh báo hạn mức, Lời khuyên AI, Nhắc nhở, Báo cáo), nút Đọc tất cả, chuyển tab thông minh khi chạm |
+| **Hồ sơ Cá nhân** | `ProfileScreen.kt` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất (Đảm bảo bảng mã UTF-8 chống lỗi font) |
+| **Chỉnh sửa Hồ sơ** | `EditProfileBottomSheet.kt` | Đổi tên hiển thị, email, số điện thoại, tải ảnh đại diện từ thiết bị, cài đặt hạn mức chi tiêu tháng |
+| **Bảng chọn màu** | `ThemeColorBottomSheet.kt` | Bottom Sheet chọn nhanh 8 màu Neon chủ đạo cho toàn hệ thống |
+| **Xác nhận chi tiêu** | `ConfirmScreen.kt` | Xem lại ảnh 3:4 đã chụp/chọn, nhập caption đè lên ảnh, xác nhận đăng bài |
 
 ---
 
@@ -102,7 +102,7 @@ Nhằm đảm bảo ứng dụng **không bị lệch form, vỡ layout, tràn m
 - **Bong bóng chat & Thông báo**: Sử dụng `layout_width="0dp"` với `app:layout_constraintStart/End` hoặc `layout_weight="1"` giúp text tự động xuống dòng linh hoạt theo bề rộng màn hình thiết bị.
 
 ### 4.3. Bảo vệ Cuộn Viewport (Scrolling & Viewport Integrity)
-- Mọi màn hình nhập liệu hoặc chi tiết (`LoginActivity`, `RegisterActivity`, `ProfileActivity`, `DashboardFragment`, `EditProfileBottomSheet`) đều được bao bọc trong `ScrollView` với thuộc tính `android:fillViewport="true"`.
+- Mọi màn hình nhập liệu hoặc chi tiết (`LoginScreen`, `RegisterScreen`, `ProfileScreen`, `DashboardScreen`, `EditProfileBottomSheet`) đều được bao bọc trong scroll modifier (`verticalScroll`) để hỗ trợ cuộn linh hoạt.
 - Khi bàn phím ảo xuất hiện trên màn hình nhỏ, toàn bộ giao diện tự động cuộn mượt mà, không che khuất các ô nhập liệu hoặc nút bấm xác nhận.
-- `RecyclerView` trong các BottomSheet được cấu hình `android:layout_height="wrap_content"` và `android:nestedScrollingEnabled="true"` để hoạt động hoàn hảo trên mọi độ phân giải.
+- Sử dụng `LazyColumn` / `LazyRow` / `HorizontalPager` / `VerticalPager` trong các màn hình danh sách và BottomSheet để tối ưu hóa hiệu năng hiển thị và hỗ trợ cuộn lồng nhau (nested scrolling).
 

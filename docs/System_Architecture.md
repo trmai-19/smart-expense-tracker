@@ -22,8 +22,8 @@
 
 | Thành phần | Công nghệ | Build Tool |
 |---|---|---|
-| Server | Java 21, Spring Boot 3.4.x | Gradle (`build.gradle`) |
-| Android | Java, Android Native (SDK 34) | Gradle (`build.gradle`) |
+| Server | Kotlin, Spring Boot 3.4.x | Gradle (`build.gradle`) |
+| Android | Kotlin, Jetpack Compose (SDK 34) | Gradle (`build.gradle`) |
 | Database | PostgreSQL | — |
 | AI | Gemini API | — |
 
@@ -55,9 +55,9 @@
 ## 3. Cấu trúc thư mục Android Client
 
 ```
-android/app/src/main/java/com/smartexpense/android/
+android/app/src/main/kotlin/com/smartexpense/android/
 ├── domain/                              ← Core business logic & models
-│   ├── model/                           Entity thuần Java (POJO)
+│   ├── model/                           Entity thuần Kotlin (Data class)
 │   ├── repository/                      Interface repository (contract)
 │   └── usecase/
 │       ├── auth/                        Use case xác thực
@@ -75,39 +75,39 @@ android/app/src/main/java/com/smartexpense/android/
 │
 ├── di/                                  Dependency Injection modules
 │
-└── presentation/                        ← UI / View Layer (Android Jetpack)
+└── presentation/                        ← UI / View Layer (Android Jetpack Compose)
     ├── auth/
-    │   ├── login/                       LoginActivity (Màn hình Đăng nhập)
-    │   └── register/                    RegisterActivity (Màn hình Đăng ký)
+    │   ├── login/                       LoginScreen.kt (Màn hình Đăng nhập)
+    │   └── register/                    RegisterScreen.kt (Màn hình Đăng ký)
     ├── camera/
-    │   ├── CameraFragment.java          Trang CameraX 3:4 & Vertical Timeline
-    │   ├── TimelineFeedAdapter.java     Adapter timeline dọc (Trang 0 preview, 1..N history)
+    │   ├── CameraScreen.kt              Trang CameraX 3:4 & Vertical Timeline
+    │   ├── TimelineFeed.kt              UI timeline dọc (Trang 0 preview, 1..N history)
     │   └── confirm/
-    │       └── ConfirmActivity.java     Xác nhận ảnh chụp, nhập caption, đăng bài
+    │       └── ConfirmScreen.kt         Xác nhận ảnh chụp, nhập caption, đăng bài
     ├── widget/
-    │   ├── WidgetGridFragment.java      Tab 0: Lưới widget chi tiêu Locket
-    │   └── WidgetGridAdapter.java       Adapter danh sách ảnh lưới
+    │   ├── WidgetGridScreen.kt          Tab 0: Lưới widget chi tiêu Locket
+    │   └── WidgetGrid.kt                UI danh sách ảnh lưới
     ├── dashboard/
-    │   └── DashboardFragment.java       Tab 1: Thống kê, biểu đồ 7 ngày, lọc khoảng ngày
+    │   └── DashboardScreen.kt           Tab 1: Thống kê, biểu đồ 7 ngày, lọc khoảng ngày
     ├── chat/
-    │   ├── ChatFragment.java            Tab 3: Trợ lý AI SET tư vấn tài chính
-    │   ├── ChatAdapter.java             Adapter bong bóng tin nhắn (Theme sync)
-    │   └── ChatMessage.java             Model tin nhắn chat
+    │   ├── ChatScreen.kt                Tab 3: Trợ lý AI SET tư vấn tài chính
+    │   ├── ChatBubble.kt                UI bong bóng tin nhắn (Theme sync)
+    │   └── ChatMessage.kt               Model tin nhắn chat
     ├── notification/
-    │   ├── NotificationManager.java     Quản lý dữ liệu thông báo & số lượng chưa đọc
-    │   ├── NotificationBottomSheet.java Modal xem thông báo & điều hướng tab
-    │   ├── NotificationAdapter.java     Adapter danh sách thông báo
-    │   └── NotificationItem.java        Model thông báo hệ thống
+    │   ├── NotificationManager.kt       Quản lý dữ liệu thông báo & số lượng chưa đọc
+    │   ├── NotificationBottomSheet.kt   Modal xem thông báo & điều hướng tab
+    │   ├── NotificationList.kt          UI danh sách thông báo
+    │   └── NotificationItem.kt          Model thông báo hệ thống
     ├── profile/
-    │   ├── ProfileActivity.java         Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách
-    │   └── EditProfileBottomSheet.java  Modal đổi ảnh avatar, tên, email, hạn mức tháng
-    ├── main/
-    │   ├── MainActivity.java            Host Activity điều phối Top bar, ViewPager2, Bottom bar
-    │   └── MainPagerAdapter.java       Adapter 4 tab [Widget | Dashboard | Camera | Chat]
+    │   ├── ProfileScreen.kt             Màn hình hồ sơ, thống kê Streak/Hóa đơn/Ngân sách
+    │   └── EditProfileBottomSheet.kt    Modal đổi ảnh avatar, tên, email, hạn mức tháng
+    ├── navigation/
+    │   ├── AppNavHost.kt                Host điều hướng chính của toàn ứng dụng
+    │   └── Screen.kt                    Định nghĩa các route
     └── util/
-        ├── ThemeManager.java            Quản lý bảng màu Neon & đổi theme động
-        ├── UserManager.java             Lưu trữ trạng thái người dùng & SharedPreferences
-        └── ThemeColorBottomSheet.java   Modal chọn nhanh 8 màu Neon chủ đạo
+        ├── ThemeManager.kt              Quản lý bảng màu Neon & đổi theme động
+        ├── UserManager.kt               Lưu trữ trạng thái người dùng & DataStore
+        └── ThemeColorBottomSheet.kt     Modal chọn nhanh 8 màu Neon chủ đạo
 ```
 
 ---
@@ -115,9 +115,9 @@ android/app/src/main/java/com/smartexpense/android/
 ## 4. Cấu trúc thư mục Server
 
 ```
-server/src/main/java/com/smartexpense/api/
+server/src/main/kotlin/com/smartexpense/api/
 ├── domain/                          ← KHÔNG phụ thuộc gì
-│   ├── model/                       Entity thuần Java (POJO)
+│   ├── model/                       Entity thuần Kotlin (Data class)
 │   ├── repository/                  Interface repository (contract)
 │   └── exception/                   Domain-level exception
 │
@@ -152,7 +152,7 @@ server/src/main/java/com/smartexpense/api/
 
 | Loại file | Server đặt tại | Android đặt tại |
 |---|---|---|
-| Entity thuần (POJO) | `domain/model/` | `domain/model/` |
+| Entity thuần (Data class) | `domain/model/` | `domain/model/` |
 | Repository Interface | `domain/repository/` | `domain/repository/` |
 | UseCase | `application/usecase/` | `domain/usecase/` |
 | DTO | `application/dto/` | `data/remote/dto/` |
@@ -162,8 +162,8 @@ server/src/main/java/com/smartexpense/api/
 | Security (JWT) | `infrastructure/security/` | — |
 | AI Adapter | `infrastructure/ai/` | — |
 | REST Controller | `presentation/controller/` | — |
-| Activity/Fragment | — | `presentation/{feature}/` |
-| ViewModel / Adapter | — | `presentation/{feature}/` |
+| Compose Screen | — | `presentation/{feature}/` |
+| ViewModel / UI Component | — | `presentation/{feature}/` |
 | State Manager / Util | — | `presentation/util/` |
 
 ---

@@ -1,7 +1,9 @@
 plugins {
-    id 'java'
     id 'org.springframework.boot' version '3.4.0'
     id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.25'
 }
 
 group = 'com.smartexpense'
@@ -9,6 +11,25 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '21'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = []
+        }
+        kotlin {
+            srcDirs = ['src/main/kotlin']
+        }
+    }
+    test {
+        java {
+            srcDirs = []
+        }
+        kotlin {
+            srcDirs = ['src/test/kotlin']
+        }
+    }
 }
 
 configurations {
@@ -28,6 +49,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // Kotlin integration
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+
     // Database Drivers
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -37,13 +63,15 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "21"
+    }
 }
 
 tasks.named('test') {

@@ -36,3 +36,9 @@
 - `GET /api/notifications`: Lấy danh sách thông báo của user, sắp xếp từ mới đến cũ (Yêu cầu JWT Token).
 - `PATCH /api/notifications/{id}/read`: Đánh dấu một thông báo cụ thể là "Đã đọc" (Yêu cầu JWT Token).
 - `PATCH /api/notifications/read-all`: Đánh dấu tất cả thông báo của user là "Đã đọc" (Yêu cầu JWT Token).
+
+## 5. Chat AI API
+- `POST /api/chat/send`: Gửi tin nhắn tới SET AI và nhận phản hồi từ Gemini 1.5 Flash (Body: `message: String`) (Yêu cầu JWT Token).
+  - Lịch sử hội thoại (tối đa 10 tin nhắn gần nhất) được tự động gửi kèm làm context cho AI.
+  - Phản hồi: `{ "reply": "..." }`
+  - Cả tin nhắn user và AI reply đều được lưu vào bảng `chat_messages`.

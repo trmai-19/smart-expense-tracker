@@ -7,7 +7,7 @@
 | Thành phần | Công nghệ |
 |---|---|
 | Server | Java, Spring Boot, Gradle |
-| Android | Android Native (Java), Gradle |
+| Android | Android Native (Kotlin, Jetpack Compose), Gradle |
 | Database | PostgreSQL |
 | AI | Gemini API |
 
@@ -27,7 +27,7 @@ mobile-app/
 - **Domain** — Entity, Repository Interface, Exception
 - **Application / UseCase** — Business logic, DTO, Port
 - **Infrastructure / Data** — Database, API Client, Security, AI Adapter
-- **Presentation / UI** — REST Controller / Activity, Fragment, ViewModel
+- **Presentation / UI** — REST Controller / Compose Screen, ViewModel
 
 ## Quy tắc làm việc
 
