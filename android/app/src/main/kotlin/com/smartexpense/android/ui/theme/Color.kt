@@ -14,15 +14,6 @@ val OnSurface      = Color(0xFFEEEEEE)
 val OnSurfaceMuted = Color(0xFF9E9E9E)
 val OnSurfaceDim   = Color(0xFF666666)
 
-// ─── 8 Neon Accent Colors ────────────────────────────────────────
-val NeonYellow  = Color(0xFFFFE600)
-val NeonLime    = Color(0xFFB2FF00)
-val NeonCyan    = Color(0xFF00F5FF)
-val NeonPink    = Color(0xFFFF00A0)
-val NeonPurple  = Color(0xFFBF5FFF)
-val NeonOrange  = Color(0xFFFF6A00)
-val NeonMint    = Color(0xFF00FFCC)
-val NeonCoral   = Color(0xFFFF4C60)
 
 // ─── Status Colors ───────────────────────────────────────────────
 val ErrorColor   = Color(0xFFFF4C60)
@@ -32,3 +23,41 @@ val WarningColor = Color(0xFFFFE600)
 // ─── Overlay / Scrim ─────────────────────────────────────────────
 val ScrimDark    = Color(0xCC000000)
 val ScrimLight   = Color(0x40000000)
+
+// ─── 12 Gradient Theme Colors (Vibrant / Neon / Unique) ──────────────────
+val ThemeSunriseStart  = Color(0xFFFF3366)
+val ThemeSunriseEnd    = Color(0xFFFF9933)
+
+val ThemeSunsetStart   = Color(0xFFF77062)
+val ThemeSunsetEnd     = Color(0xFFFE5196)
+
+val ThemeBerryStart    = Color(0xFFB122E5)
+val ThemeBerryEnd      = Color(0xFFFF63DE)
+
+val ThemeOceanStart    = Color(0xFF00C9FF)
+val ThemeOceanEnd      = Color(0xFF92FE9D)
+
+val ThemeForestStart   = Color(0xFF00F260)
+val ThemeForestEnd     = Color(0xFF0575E6)
+
+val ThemeLimeStart     = Color(0xFFCCFF00)
+val ThemeLimeEnd       = Color(0xFF00E676)
+
+// Giữ nguyên Hồng Hạc theo yêu cầu
+val ThemeFlamingoStart = Color(0xFFFF9966)
+val ThemeFlamingoEnd   = Color(0xFFFF5E62)
+
+val ThemeAmethystStart = Color(0xFFB224EF)
+val ThemeAmethystEnd   = Color(0xFF00B4DB)
+
+val ThemeFireStart     = Color(0xFFFF0844)
+val ThemeFireEnd       = Color(0xFFFFB199)
+
+val ThemeTropicalStart = Color(0xFFFEE140)
+val ThemeTropicalEnd   = Color(0xFFFA709A)
+
+val ThemeAuroraStart   = Color(0xFF00F2FE)
+val ThemeAuroraEnd     = Color(0xFF4FACFE)
+
+val ThemeNeonNightStart = Color(0xFFFF007F)
+val ThemeNeonNightEnd   = Color(0xFF00F2FE)

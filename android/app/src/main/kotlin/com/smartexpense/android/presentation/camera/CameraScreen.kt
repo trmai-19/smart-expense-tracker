@@ -100,55 +100,7 @@ fun CameraScreen(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Controls row (top)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = { galleryLauncher.launch("image/*") },
-                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
-                        ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = OnSurface, modifier = Modifier.size(28.dp))
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(CircleShape)
-                                .border(4.dp, accentColor, CircleShape)
-                                .background(if (isCapturing) accentColor.copy(alpha = 0.5f) else Color.White)
-                                .clickable(enabled = !isCapturing) {
-                                    val capture = imageCapture ?: return@clickable
-                                    isCapturing = true
-                                    val outputDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES) ?: context.filesDir
-                                    val photoFile = File(outputDir, "SET_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg")
-                                    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-                                    val executor = Executors.newSingleThreadExecutor()
-                                    capture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
-                                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                                            isCapturing = false
-                                            onCaptureConfirm(Uri.fromFile(photoFile).toString())
-                                        }
-                                        override fun onError(e: ImageCaptureException) { isCapturing = false }
-                                    })
-                                }
-                        ) {}
-
-                        IconButton(
-                            onClick = {
-                                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
-                            },
-                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
-                        ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = OnSurface, modifier = Modifier.size(28.dp))
-                        }
-                    }
-
-                    // Camera Preview (middle, fills remaining space)
+                    // Camera Preview (top, fills most of the screen)
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -179,12 +131,63 @@ fun CameraScreen(
                         }
                     }
 
-                    // "Lich su up" hint at bottom
+                    // Controls row (gallery | capture | flip) – below preview, all 3 in same row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp, vertical = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Gallery
+                        IconButton(
+                            onClick = { galleryLauncher.launch("image/*") },
+                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
+                        ) {
+                            Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = OnSurface, modifier = Modifier.size(28.dp))
+                        }
+
+                        // Capture button
+                        Box(
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape)
+                                .border(4.dp, accentColor, CircleShape)
+                                .background(if (isCapturing) accentColor.copy(alpha = 0.5f) else Color.White)
+                                .clickable(enabled = !isCapturing) {
+                                    val capture = imageCapture ?: return@clickable
+                                    isCapturing = true
+                                    val outputDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES) ?: context.filesDir
+                                    val photoFile = File(outputDir, "SET_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg")
+                                    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+                                    val executor = Executors.newSingleThreadExecutor()
+                                    capture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
+                                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                                            isCapturing = false
+                                            onCaptureConfirm(Uri.fromFile(photoFile).toString())
+                                        }
+                                        override fun onError(e: ImageCaptureException) { isCapturing = false }
+                                    })
+                                }
+                        ) {}
+
+                        // Flip camera
+                        IconButton(
+                            onClick = {
+                                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
+                            },
+                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
+                        ) {
+                            Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = OnSurface, modifier = Modifier.size(28.dp))
+                        }
+                    }
+
+                    // "Lịch sử ↑" hint at the very bottom
                     if (expenses.isNotEmpty()) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                            modifier = Modifier.padding(bottom = 16.dp)
                         ) {
                             Text("Lịch sử", color = accentColor, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium))
                             Icon(Icons.Default.KeyboardArrowUp, "Up arrow", tint = accentColor, modifier = Modifier.size(16.dp))
@@ -274,13 +277,13 @@ private fun HistoryCard(
         ) {
             AsyncImage(
                 model = imageUrl,
-                contentDescription = expense.caption,
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
+                contentDescription = expense.caption ?: "Không có chú thích",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
             )
 
             // Caption Pill
-            if (expense.caption.isNotEmpty()) {
+            if (!expense.caption.isNullOrEmpty()) {
                 Text(
                     text = expense.caption,
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
@@ -340,7 +343,7 @@ private fun HistoryCard(
         Text(
             text = androidx.compose.ui.text.buildAnnotatedString {
                 append("${expense.category} · $dateText · ")
-                withStyle(androidx.compose.ui.text.SpanStyle(color = accentColor)) {
+                withStyle(androidx.compose.ui.text.SpanStyle(color = accentColor, fontWeight = FontWeight.Bold)) {
                     append(formattedAmount)
                 }
             },

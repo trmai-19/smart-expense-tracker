@@ -7,6 +7,6 @@ data class ExpenseResponseDto(
     @SerializedName("amount") val amount: Double,
     @SerializedName("category") val category: String,
     @SerializedName("photoUrl") val photoUrl: String,
-    @SerializedName("caption") val caption: String,
+    @SerializedName("caption") val caption: String?,
     @SerializedName("expenseDate") val expenseDate: String
 )

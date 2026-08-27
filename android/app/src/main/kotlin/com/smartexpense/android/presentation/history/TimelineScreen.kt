@@ -131,7 +131,7 @@ fun TimelineScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = expense.caption,
+                                text = expense.caption ?: "",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White
                             )

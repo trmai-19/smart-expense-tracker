@@ -47,8 +47,11 @@ class MainActivity : ComponentActivity() {
             var accentColor by remember {
                 mutableStateOf(ThemeManager.getAccentComposeColor(context))
             }
+            var accentBrush by remember {
+                mutableStateOf(ThemeManager.getAccentColor(context).composeBrush)
+            }
 
-            SmartExpenseTheme(accentColor = accentColor) {
+            SmartExpenseTheme(accentColor = accentColor, accentBrush = accentBrush) {
                 val navController = rememberNavController()
 
 
@@ -67,6 +70,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         onThemeUpdated = {
                             accentColor = ThemeManager.getAccentComposeColor(context)
+                            accentBrush = ThemeManager.getAccentColor(context).composeBrush
                         }
                     )
                 }

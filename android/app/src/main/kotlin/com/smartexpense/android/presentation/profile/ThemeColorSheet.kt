@@ -75,7 +75,7 @@ fun ThemeColorSheet(
                             modifier = Modifier
                                 .size(52.dp)
                                 .clip(CircleShape)
-                                .background(accent.composeColor)
+                                .background(accent.composeBrush)
                                 .then(
                                     if (isSelected) Modifier.border(3.dp, OnBackground, CircleShape)
                                     else Modifier

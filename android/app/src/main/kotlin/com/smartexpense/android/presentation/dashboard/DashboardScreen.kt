@@ -308,7 +308,7 @@ private fun sameDay(a: Date, b: Date): Boolean {
 @Composable
 private fun BarChart(
     bars: List<BarEntry>,
-    accentColor: androidx.compose.ui.graphics.Color
+    accentBrush: androidx.compose.ui.graphics.Brush
 ) {
     if (bars.isEmpty()) return
     val maxVal = bars.maxOf { it.amount }.takeIf { it > 0 } ?: 1.0
@@ -324,16 +324,22 @@ private fun BarChart(
             val fraction = (entry.amount / maxVal).toFloat().coerceIn(0f, 1f)
             Column(
                 modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Bottom
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .fillMaxHeight(fraction.coerceAtLeast(0.02f))
-                        .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
-                        .background(if (fraction > 0f) accentColor else Surface)
-                )
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .fillMaxHeight(fraction.coerceAtLeast(0.02f))
+                            .clip(RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp))
+                            .let { if (fraction > 0f) it.background(accentBrush) else it.background(Surface) }
+                    )
+                }
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = entry.label,
@@ -354,6 +360,7 @@ fun DashboardScreen(
     expenseViewModel: ExpenseViewModel = viewModel(factory = ViewModelFactory.getInstance())
 ) {
     val accentColor = LocalAccentColor.current
+    val accentBrush = LocalAccentBrush.current
     val expensesState by expenseViewModel.expenses.observeAsState(emptyList())
     val expenses = expensesState ?: emptyList()
 
@@ -437,7 +444,7 @@ fun DashboardScreen(
                         modifier = Modifier
                             .weight(1f).fillMaxHeight()
                             .clip(RoundedCornerShape(50))
-                            .background(if (selected) accentColor else androidx.compose.ui.graphics.Color.Transparent)
+                            .let { if (selected) it.background(accentBrush) else it.background(androidx.compose.ui.graphics.Color.Transparent) }
                             .clickable {
                                 selectedTab = tab
                                 if (tab == PeriodTab.CUSTOM) showDatePicker = true
@@ -458,12 +465,11 @@ fun DashboardScreen(
         if (selectedTab == PeriodTab.CUSTOM && customFrom != null && customTo != null) {
             item {
                 val fmt = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                Text(
-                    text = "${fmt.format(customFrom!!)} – ${fmt.format(customTo!!)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = accentColor,
-                    modifier = Modifier.clickable { showDatePicker = true }
-                )
+                    Text(
+                        text = "${fmt.format(customFrom!!)} – ${fmt.format(customTo!!)}",
+                        style = MaterialTheme.typography.bodySmall.copy(brush = accentBrush),
+                        modifier = Modifier.clickable { showDatePicker = true }
+                    )
             }
         }
 
@@ -483,7 +489,7 @@ fun DashboardScreen(
                     }
                     Text("Tổng chi tiêu $periodLabel", style = MaterialTheme.typography.bodyMedium, color = OnSurfaceMuted)
                     Spacer(Modifier.height(4.dp))
-                    Text(formatVnd(totalAmount.toLong()), style = MaterialTheme.typography.displayMedium, color = accentColor)
+                    Text(formatVnd(totalAmount.toLong()), style = MaterialTheme.typography.displayMedium.copy(brush = accentBrush))
                     Spacer(Modifier.height(4.dp))
                     Text("${filteredExpenses.size} giao dịch", style = MaterialTheme.typography.bodySmall, color = OnSurfaceDim)
                 }
@@ -511,7 +517,7 @@ fun DashboardScreen(
                             Text("Chưa có dữ liệu", color = OnSurfaceMuted)
                         }
                     } else {
-                        BarChart(bars = bars, accentColor = accentColor)
+                        BarChart(bars = bars, accentBrush = accentBrush)
                     }
                 }
             }

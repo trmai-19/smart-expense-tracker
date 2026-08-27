@@ -8,17 +8,28 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 // Composition Local để truyền accent color động xuống toàn bộ cây Compose
-val LocalAccentColor = compositionLocalOf<Color> { NeonYellow }
+val LocalAccentColor = compositionLocalOf<Color> { ThemeSunriseStart }
+val LocalAccentBrush = compositionLocalOf<androidx.compose.ui.graphics.Brush> { androidx.compose.ui.graphics.Brush.linearGradient(listOf(ThemeSunriseStart, ThemeSunriseEnd)) }
+
+val DarkColorScheme = darkColorScheme(
+    primary = ThemeSunriseStart,
+    background = Background,
+    surface = Surface,
+    onPrimary = Background,
+    onBackground = OnBackground,
+    onSurface = OnSurface
+)
 
 /**
  * SmartExpenseTheme
  *
  * @param accentColor Màu neon hiện tại từ ThemeManager.getAccentColor().
- *                    Truyền vào từ Activity/Screen level sau khi đọc SharedPreferences.
+ * @param accentBrush Brush hiện tại.
  */
 @Composable
 fun SmartExpenseTheme(
-    accentColor: Color = NeonYellow,
+    accentColor: Color = ThemeSunriseStart,
+    accentBrush: androidx.compose.ui.graphics.Brush = androidx.compose.ui.graphics.Brush.linearGradient(listOf(ThemeSunriseStart, ThemeSunriseEnd)),
     content: @Composable () -> Unit
 ) {
     val colorScheme = darkColorScheme(
@@ -45,7 +56,10 @@ fun SmartExpenseTheme(
         outlineVariant   = SurfaceVariant
     )
 
-    CompositionLocalProvider(LocalAccentColor provides accentColor) {
+    CompositionLocalProvider(
+        LocalAccentColor provides accentColor,
+        LocalAccentBrush provides accentBrush
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography  = AppTypography,

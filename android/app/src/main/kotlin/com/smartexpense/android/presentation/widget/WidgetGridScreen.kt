@@ -61,7 +61,7 @@ fun WidgetGridScreen(
                     ExpenseGridCard(
                         photoUrl = expense.photoUrl,
                         amount = expense.amount.toLong(),
-                        caption = expense.caption,
+                        caption = expense.caption ?: "",
                         accentColor = accentColor,
                         onClick = { onExpenseClick(index) }
                     )

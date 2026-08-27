@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Check
 import com.smartexpense.android.ui.theme.SurfaceCard
 import androidx.navigation.NavController
 import com.smartexpense.android.R
@@ -34,6 +36,7 @@ import com.smartexpense.android.presentation.widget.WidgetGridScreen
 import com.smartexpense.android.ui.theme.Background
 import com.smartexpense.android.ui.theme.OnSurface
 import com.smartexpense.android.ui.theme.OnSurfaceMuted
+import com.smartexpense.android.ui.theme.LocalAccentBrush
 import androidx.compose.runtime.livedata.observeAsState
 import kotlinx.coroutines.launch
 
@@ -65,9 +68,14 @@ fun MainScreen(
     val filtered = if (selectedCategory == "Tất cả") expenses else expenses.filter { it.category == selectedCategory }
 
     // Camera = vertical page 0; history = pages 1..N (newest first)
+    // derivedStateOf ensures pageCount lambda always reflects current filtered.size
     val verticalPagerState = androidx.compose.foundation.pager.rememberPagerState(
-        initialPage = 0
-    ) { filtered.size + 1 }
+        initialPage = 0,
+        pageCount = { filtered.size + 1 }
+    )
+
+    // When data loads, filtered.size > 0 but pager is still on page 0 (camera) – OK, no scroll needed
+    // When widget navigates to history, it calls verticalPagerState.animateScrollToPage(index+1)
 
     // FAB hidden only when on the actual camera page (vertical page 0) in the Camera tab
     val isOnCameraPage = pagerState.currentPage == 2 && verticalPagerState.currentPage == 0
@@ -110,11 +118,9 @@ fun MainScreen(
                         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                             Text(
                                 text = "SET",
-                                style = MaterialTheme.typography.headlineMedium.copy(
+                                style = MaterialTheme.typography.displaySmall.copy(
                                     fontWeight = FontWeight.Black,
-                                    brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                        listOf(accentColor, accentColor.copy(alpha = 0.7f), accentColor)
-                                    )
+                                    brush = LocalAccentBrush.current
                                 )
                             )
                         }
@@ -123,42 +129,63 @@ fun MainScreen(
                         // Widget or history: show category dropdown
                         var expanded by remember { mutableStateOf(false) }
                         Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
-                                    .background(androidx.compose.ui.graphics.Color(0xFF1E243A))
-                                    .clickable { expanded = true }
-                                    .padding(horizontal = 16.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    text = selectedCategory,
-                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = androidx.compose.ui.graphics.Color.White
-                                )
-                                Spacer(Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.Default.KeyboardArrowDown,
-                                    contentDescription = "Dropdown",
-                                    tint = androidx.compose.ui.graphics.Color.White,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                                modifier = Modifier
-                                    .background(SurfaceCard)
-                                    .heightIn(max = (5 * 48).dp) // max 5 items visible
-                            ) {
-                                categories.forEach { cat ->
-                                    DropdownMenuItem(
-                                        text = { Text(cat, color = OnSurface) },
-                                        onClick = {
-                                            selectedCategory = cat
-                                            expanded = false
-                                        }
+                            Box {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                                        .background(SurfaceCard)
+                                        .border(1.dp, LocalAccentBrush.current, androidx.compose.foundation.shape.RoundedCornerShape(20.dp))
+                                        .clickable { expanded = true }
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = selectedCategory,
+                                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                        color = androidx.compose.ui.graphics.Color.White
                                     )
+                                    Spacer(Modifier.width(8.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.KeyboardArrowDown,
+                                        contentDescription = "Dropdown",
+                                        tint = androidx.compose.ui.graphics.Color.White,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false },
+                                    modifier = Modifier
+                                        .background(SurfaceCard)
+                                        .width(160.dp)
+                                        .heightIn(max = (5 * 48).dp)
+                                ) {
+                                    categories.forEach { cat ->
+                                        val isSelected = selectedCategory == cat
+                                        DropdownMenuItem(
+                                            text = {
+                                                Text(
+                                                    text = cat,
+                                                    color = if (isSelected) accentColor else OnSurface,
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                            },
+                                            trailingIcon = {
+                                                if (isSelected) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Check,
+                                                        contentDescription = null,
+                                                        tint = accentColor,
+                                                        modifier = Modifier.size(18.dp)
+                                                    )
+                                                }
+                                            },
+                                            onClick = {
+                                                selectedCategory = cat
+                                                expanded = false
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -179,8 +206,8 @@ fun MainScreen(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_notifications),
                         contentDescription = "Thông báo",
-                        tint = OnSurface,
-                        modifier = Modifier.size(24.dp)
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -225,13 +252,15 @@ fun MainScreen(
                         }
                     )
                     1 -> DashboardScreen()
-                    2 -> CameraScreen(
-                        verticalPagerState = verticalPagerState,
-                        expenses = filtered,
-                        onCaptureConfirm = { path ->
-                            navController.navigate(Screen.Confirm.createRoute(path))
-                        }
-                    )
+                    2 -> Box(modifier = Modifier.fillMaxSize()) {
+                        CameraScreen(
+                            verticalPagerState = verticalPagerState,
+                            expenses = filtered,
+                            onCaptureConfirm = { path ->
+                                navController.navigate(Screen.Confirm.createRoute(path))
+                            }
+                        )
+                    }
                     3 -> ChatScreen()
                 }
             }

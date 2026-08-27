@@ -58,7 +58,7 @@ fun RegisterScreen(
     LaunchedEffect(authSuccess) {
         authSuccess?.let { response ->
             UserManager.saveToken(context, response.token)
-            UserManager.setUserName(context, response.userProfile.displayName)
+            UserManager.setUserName(context, response.displayName)
             onRegisterSuccess()
         }
     }
