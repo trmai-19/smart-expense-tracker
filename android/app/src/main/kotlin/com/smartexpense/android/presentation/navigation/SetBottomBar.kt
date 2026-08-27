@@ -3,6 +3,7 @@ package com.smartexpense.android.presentation.navigation
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -28,7 +29,7 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem(0, R.drawable.ic_grid_widget, "Grid"),
     BottomNavItem(1, R.drawable.ic_dashboard_tab, "Stats"),
-    BottomNavItem(2, R.drawable.ic_camera_tab, "Camera"),
+    BottomNavItem(2, R.drawable.ic_home, "Home"),
     BottomNavItem(3, R.drawable.ic_chat, "Chat")
 )
 
@@ -44,7 +45,6 @@ fun SetBottomBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Surface)
             .navigationBarsPadding()
     ) {
         Row(
@@ -53,57 +53,28 @@ fun SetBottomBar(
                 .height(64.dp)
                 .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            // First 2 icons (Grid, Stats)
-            Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceEvenly) {
-                NavIcon(bottomNavItems[0], currentPage, accentColor, onPageSelected)
-                NavIcon(bottomNavItems[1], currentPage, accentColor, onPageSelected)
-            }
+            NavIcon(bottomNavItems[0], currentPage, accentColor, onPageSelected)
+            NavIcon(bottomNavItems[1], currentPage, accentColor, onPageSelected)
+            NavIcon(bottomNavItems[2], currentPage, accentColor, onPageSelected)
+            NavIcon(bottomNavItems[3], currentPage, accentColor, onPageSelected)
 
-            // Center FAB (Camera) – hidden when already on camera page
-            val fabScale by animateFloatAsState(
-                targetValue = if (isOnCameraPage) 0f else 1f,
-                animationSpec = tween(durationMillis = 200),
-                label = "camScale"
-            )
+            // Palette
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(48.dp)
-                    .offset(y = (-8).dp)
-                    .scale(fabScale)
                     .clip(CircleShape)
-                    .background(accentColor)
-                    .clickable(enabled = !isOnCameraPage) { onPageSelected(2) }
+                    .background(Color.White.copy(alpha = 0.08f))
+                    .clickable { onPaletteClick() }
             ) {
                 Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_camera_tab),
-                    contentDescription = "Camera",
-                    tint = Background,
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_palette),
+                    contentDescription = "Theme",
+                    tint = Color.White.copy(alpha = 0.7f),
                     modifier = Modifier.size(24.dp)
                 )
-            }
-
-            // Right 2 icons (Chat, Palette)
-            Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceEvenly) {
-                NavIcon(bottomNavItems[3], currentPage, accentColor, onPageSelected)
-
-                // Palette
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .clickable { onPaletteClick() }
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_palette),
-                        contentDescription = "Theme",
-                        tint = OnSurfaceDim,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
             }
         }
     }
@@ -117,17 +88,23 @@ private fun NavIcon(
     onPageSelected: (Int) -> Unit
 ) {
     val isSelected = currentPage == item.pageIndex
+    val bgColor = if (isSelected) accentColor.copy(alpha = 0.15f) else Color.White.copy(alpha = 0.08f)
+    val borderColor = if (isSelected) accentColor.copy(alpha = 0.5f) else Color.Transparent
+    val iconColor = if (isSelected) accentColor else Color.White.copy(alpha = 0.7f)
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
+            .background(bgColor)
+            .border(1.dp, borderColor, CircleShape)
             .clickable { onPageSelected(item.pageIndex) }
     ) {
         Icon(
             imageVector = ImageVector.vectorResource(item.iconResId),
             contentDescription = item.label,
-            tint = if (isSelected) accentColor else OnSurfaceDim,
+            tint = iconColor,
             modifier = Modifier.size(24.dp)
         )
     }

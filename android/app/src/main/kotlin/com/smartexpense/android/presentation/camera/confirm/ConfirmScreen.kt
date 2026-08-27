@@ -52,7 +52,7 @@ fun ConfirmScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(androidx.compose.ui.graphics.Color.Transparent)
             .verticalScroll(rememberScrollState())
     ) {
         // ── Top Bar ────────────────────────────────────────────────

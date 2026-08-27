@@ -428,7 +428,7 @@ fun DashboardScreen(
     }
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().background(Background).padding(horizontal = 20.dp),
+        modifier = Modifier.fillMaxSize().background(androidx.compose.ui.graphics.Color.Transparent).padding(horizontal = 20.dp),
         contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

@@ -82,12 +82,11 @@ fun MainScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Background,
+        containerColor = androidx.compose.ui.graphics.Color.Transparent,
         topBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Background.copy(alpha = 0.9f))
                     .statusBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -202,7 +201,10 @@ fun MainScreen(
                 }
 
                 // Bell
-                IconButton(onClick = { showNotifications = true }) {
+                IconButton(
+                    onClick = { showNotifications = true },
+                    modifier = Modifier.background(SurfaceCard, CircleShape)
+                ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_notifications),
                         contentDescription = "Thông báo",

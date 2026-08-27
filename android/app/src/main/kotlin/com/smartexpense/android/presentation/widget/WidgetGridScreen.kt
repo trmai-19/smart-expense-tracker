@@ -37,7 +37,7 @@ fun WidgetGridScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(androidx.compose.ui.graphics.Color.Transparent)
     ) {
         Spacer(Modifier.height(12.dp))
 

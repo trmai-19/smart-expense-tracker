@@ -50,7 +50,7 @@ fun ChatScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(androidx.compose.ui.graphics.Color.Transparent)
     ) {
         // ── Messages ───────────────────────────────────────────────
         LazyColumn(

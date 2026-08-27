@@ -91,7 +91,7 @@ fun CameraScreen(
         state = verticalPagerState,
         modifier = Modifier
             .fillMaxSize()
-            .background(Background)
+            .background(androidx.compose.ui.graphics.Color.Transparent)
     ) { page ->
         if (page == 0) {
             // ── Camera page ────────────────────────────────────────────
@@ -142,18 +142,19 @@ fun CameraScreen(
                         // Gallery
                         IconButton(
                             onClick = { galleryLauncher.launch("image/*") },
-                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
+                            modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
                         ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = OnSurface, modifier = Modifier.size(28.dp))
+                            Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
 
                         // Capture button
                         Box(
+                            contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(72.dp)
+                                .size(64.dp)
                                 .clip(CircleShape)
-                                .border(4.dp, accentColor, CircleShape)
-                                .background(if (isCapturing) accentColor.copy(alpha = 0.5f) else Color.White)
+                                .background(Color.White.copy(alpha = 0.1f))
+                                .border(2.dp, accentColor.copy(alpha = 0.6f), CircleShape)
                                 .clickable(enabled = !isCapturing) {
                                     val capture = imageCapture ?: return@clickable
                                     isCapturing = true
@@ -169,16 +170,23 @@ fun CameraScreen(
                                         override fun onError(e: ImageCaptureException) { isCapturing = false }
                                     })
                                 }
-                        ) {}
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isCapturing) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.8f))
+                            )
+                        }
 
                         // Flip camera
                         IconButton(
                             onClick = {
                                 lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
                             },
-                            modifier = Modifier.size(56.dp).clip(CircleShape).background(SurfaceVariant)
+                            modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
                         ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = OnSurface, modifier = Modifier.size(28.dp))
+                            Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = Color.White, modifier = Modifier.size(24.dp))
                         }
                     }
 
@@ -189,8 +197,8 @@ fun CameraScreen(
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             modifier = Modifier.padding(bottom = 16.dp)
                         ) {
-                            Text("Lịch sử", color = accentColor, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium))
-                            Icon(Icons.Default.KeyboardArrowUp, "Up arrow", tint = accentColor, modifier = Modifier.size(16.dp))
+                            Text("Lịch sử", color = Color.White, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold))
+                            Icon(Icons.Default.KeyboardArrowUp, "Up arrow", tint = Color.White, modifier = Modifier.size(20.dp))
                         }
                     } else {
                         Spacer(modifier = Modifier.height(32.dp))

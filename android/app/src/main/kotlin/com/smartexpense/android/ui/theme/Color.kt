@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 
 // ─── Background & Surface ───────────────────────────────────────
 val Background     = Color(0xFF0D0D0D)
-val Surface        = Color(0xFF1A1A1A)
-val SurfaceVariant = Color(0xFF242424)
-val SurfaceCard    = Color(0xFF2A2A2A)
+val Surface        = Color(0xB31A1A1A) // 70% opacity
+val SurfaceVariant = Color(0x99242424) // 60% opacity
+val SurfaceCard    = Color(0x992A2A2A) // 60% opacity
 
 // ─── Text ────────────────────────────────────────────────────────
 val OnBackground   = Color(0xFFFFFFFF)
