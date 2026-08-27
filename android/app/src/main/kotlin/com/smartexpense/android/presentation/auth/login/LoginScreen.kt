@@ -14,6 +14,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +51,9 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
+    
+    var isEmailFocused by remember { mutableStateOf(false) }
+    var isPasswordFocused by remember { mutableStateOf(false) }
 
     val authSuccess by authViewModel.authSuccess.observeAsState()
     val authError   by authViewModel.authError.observeAsState()
@@ -106,7 +111,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(52.dp))
 
             // ── Email field ───────────────────────────────────────
-            OutlinedTextField(
+            TextField(
                 value = email,
                 onValueChange = { email = it; emailError = null },
                 label = { Text("Tên đăng nhập / Email") },
@@ -120,7 +125,14 @@ fun LoginScreen(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                 ),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isEmailFocused = it.isFocused }
+                    .border(
+                        width = 1.dp,
+                        color = if (isEmailFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent,
+                        shape = MaterialTheme.shapes.medium
+                    ),
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium
             )
@@ -128,7 +140,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // ── Password field ────────────────────────────────────
-            OutlinedTextField(
+            TextField(
                 value = password,
                 onValueChange = { password = it; passwordError = null },
                 label = { Text("Mật khẩu") },
@@ -151,7 +163,14 @@ fun LoginScreen(
                 ),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isPasswordFocused = it.isFocused }
+                    .border(
+                        width = 1.dp,
+                        color = if (isPasswordFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent,
+                        shape = MaterialTheme.shapes.medium
+                    ),
                 singleLine = true,
                 shape = MaterialTheme.shapes.medium
             )

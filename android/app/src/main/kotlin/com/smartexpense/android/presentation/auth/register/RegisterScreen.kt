@@ -13,6 +13,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.border
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -50,6 +52,11 @@ fun RegisterScreen(
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmError by remember { mutableStateOf<String?>(null) }
+    
+    var isNameFocused by remember { mutableStateOf(false) }
+    var isEmailFocused by remember { mutableStateOf(false) }
+    var isPasswordFocused by remember { mutableStateOf(false) }
+    var isConfirmFocused by remember { mutableStateOf(false) }
 
     val authSuccess by authViewModel.authSuccess.observeAsState()
     val authError   by authViewModel.authError.observeAsState()
@@ -108,7 +115,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(36.dp))
 
             // ── Fields ─────────────────────────────────────────────
-            OutlinedTextField(
+            TextField(
                 value = displayName,
                 onValueChange = { displayName = it; nameError = null },
                 label = { Text("Tên hiển thị") },
@@ -117,12 +124,16 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isNameFocused = it.isFocused }
+                    .border(1.dp, if (isNameFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
+            TextField(
                 value = email,
                 onValueChange = { email = it; emailError = null },
                 label = { Text("Email") },
@@ -131,12 +142,16 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isEmailFocused = it.isFocused }
+                    .border(1.dp, if (isEmailFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
+            TextField(
                 value = password,
                 onValueChange = { password = it; passwordError = null },
                 label = { Text("Mật khẩu") },
@@ -155,12 +170,16 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isPasswordFocused = it.isFocused }
+                    .border(1.dp, if (isPasswordFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium
             )
             Spacer(modifier = Modifier.height(10.dp))
 
-            OutlinedTextField(
+            TextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it; confirmError = null },
                 label = { Text("Xác nhận mật khẩu") },
@@ -170,8 +189,12 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 colors = setTextFieldColors(accentColor),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { isConfirmFocused = it.isFocused }
+                    .border(1.dp, if (isConfirmFocused) accentColor else androidx.compose.ui.graphics.Color.Transparent, MaterialTheme.shapes.medium),
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium
             )
 
             Spacer(modifier = Modifier.height(8.dp))

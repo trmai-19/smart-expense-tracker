@@ -51,7 +51,7 @@
    - **Cách 2: Thanh Bottom Bar 5 Slot**:
      - **Slot 1 (Trái cùng)**: Tab 0 - Lưới Widget (`WidgetGridScreen`).
      - **Slot 2**: Tab 1 - Dashboard Thống kê (`DashboardScreen`).
-     - **Slot 3 (Chính giữa)**: Tab 2 - Camera (`CameraScreen`) với nút tròn viền sáng accent.
+     - **Slot 3 (Chính giữa)**: Tab 2 - Camera (`CameraScreen`) với icon Ngôi nhà (Home), tất cả 5 slot đều được chia đều khoảng cách với nền mờ Glassmorphism đồng nhất.
      - **Slot 4**: Tab 3 - Trợ lý AI SET (`ChatScreen`).
      - **Slot 5 (Phải cùng)**: Bật ngay `ThemeColorBottomSheet` (Modal chọn 8 màu Neon chủ đạo).
 

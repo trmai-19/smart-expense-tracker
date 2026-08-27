@@ -72,12 +72,12 @@ presentation/
 
 | Màn hình / Component | Compose UI | Mô tả tính năng |
 |---|---|---|
-| **Đăng nhập** | `LoginScreen.kt` | Tên app "Smart Expense Tracker", form đăng nhập, hiệu ứng chuyển cảnh mượt mà |
-| **Đăng ký** | `RegisterScreen.kt` | Form tạo tài khoản, xác nhận mật khẩu, đồng bộ tên hiển thị ban đầu |
-| **Màn hình chính (Host)** | `AppNavHost.kt` | Top bar (Avatar, Tên app/Bộ lọc, Chuông thông báo + Red badge), Navigation Host, Bottom bar 5 slot |
+| **Đăng nhập** | `LoginScreen.kt` | Tên app "Smart Expense Tracker", form đăng nhập với `TextField` viền focus động tinh tế chống lỗi render nhãn, chuyển cảnh mượt mà |
+| **Đăng ký** | `RegisterScreen.kt` | Form tạo tài khoản, xác nhận mật khẩu, đồng bộ tên hiển thị ban đầu, sử dụng `TextField` viền focus động |
+| **Màn hình chính (Host)** | `AppNavHost.kt` | Top bar (Avatar, Tên app/Bộ lọc, Chuông thông báo), Navigation Host, Bottom bar 5 slot cách đều nhau với nền mờ Glassmorphism |
 | **Tab 0: Lưới Widget** | `WidgetGridScreen.kt` | Lưới ảnh widget chi tiêu 3:4 phong cách Locket (Dùng `Coil` tải ảnh & đồng bộ API thật), xem lại ảnh, lọc danh mục |
 | **Tab 1: Thống kê** | `DashboardScreen.kt` | Tổng chi tiêu, phân bổ %, biểu đồ 7 cột, bộ lọc khoảng ngày linh hoạt |
-| **Tab 2: Camera & Timeline** | `CameraScreen.kt`, `TimelineFeed.kt` | Trang 0: Camera preview 3:4 + nút chụp Locket viền đôi; Trang 1..N: Cuộn dọc xem từng chi tiêu (Tải ảnh `Coil`, định dạng ngày giờ Việt Nam) kèm tên người dùng và avatar viền accent |
+| **Tab 2: Camera & Timeline** | `CameraScreen.kt`, `TimelineFeed.kt` | Trang 0: Camera preview 3:4, nút chụp trong suốt lõi trắng mờ viền neon, hint "Lịch sử" trắng đậm; Trang 1..N: Lịch sử dọc |
 | **Tab 3: Trợ lý AI SET** | `ChatScreen.kt`, `ChatBubble.kt` | Nhắn tin tư vấn tài chính, nền tin nhắn người dùng đổi theo theme, tự động ẩn bottom bar khi mở bàn phím |
 | **Bảng Thông báo** | `NotificationBottomSheet.kt` | Danh sách thông báo (Cảnh báo hạn mức, Lời khuyên AI, Nhắc nhở, Báo cáo), nút Đọc tất cả, chuyển tab thông minh khi chạm |
 | **Hồ sơ Cá nhân** | `ProfileScreen.kt` | Avatar lớn viền accent, thẻ thống kê (🔥 Streak, 📸 Hóa đơn, 🎯 Ngân sách), menu Bạn bè/Mã SET, Bảo mật, Đăng xuất (Đảm bảo bảng mã UTF-8 chống lỗi font) |
