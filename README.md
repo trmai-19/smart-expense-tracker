@@ -32,3 +32,7 @@ mobile-app/
 ## Quy tắc làm việc
 
 > **BẮT BUỘC**: Khi hoàn thành xong một công việc, tính năng hoặc cấu hình, bắt buộc phải ghi chép và mô tả chi tiết vào các file tương ứng trong thư mục `docs/`. Tài liệu có thể là về API, usecase, database, kiến trúc hệ thống, luồng UI,... Điều này đảm bảo rằng khi đọc code có thể hiểu nhanh dự án mà không cần đọc từng file và cấu hình.
+
+## Dành cho Developer mới nhận bàn giao
+
+👉 Xem ngay tài liệu [**Developer_Handover.md**](file:///d:/mobile-app/docs/Developer_Handover.md) để biết chính xác những việc đã hoàn thành, những lỗi vừa fix và danh sách các tính năng chưa code (tính toán Streak, Notification, Đồng bộ Hạn mức...).

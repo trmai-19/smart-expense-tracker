@@ -29,8 +29,10 @@ class AuthUseCaseImpl(
         }
 
         val token = jwtTokenPort.generateToken(user)
+        val refreshToken = jwtTokenPort.generateRefreshToken(user)
         return AuthResponseDto(
             token = token,
+            refreshToken = refreshToken,
             userId = user.id!!,
             displayName = user.displayName,
             email = user.email
@@ -55,12 +57,35 @@ class AuthUseCaseImpl(
 
         val savedUser = userRepository.save(newUser)
         val token = jwtTokenPort.generateToken(savedUser)
+        val refreshToken = jwtTokenPort.generateRefreshToken(savedUser)
 
         return AuthResponseDto(
             token = token,
+            refreshToken = refreshToken,
             userId = savedUser.id!!,
             displayName = savedUser.displayName,
             email = savedUser.email
+        )
+    }
+
+    override fun refreshToken(request: com.smartexpense.api.application.dto.request.RefreshTokenRequestDto): AuthResponseDto {
+        if (!jwtTokenPort.validateToken(request.refreshToken)) {
+            throw AuthException("Invalid or expired refresh token")
+        }
+
+        val email = jwtTokenPort.getEmailFromToken(request.refreshToken)
+        val user = userRepository.findByEmail(email)
+            ?: throw AuthException("User not found")
+
+        val newToken = jwtTokenPort.generateToken(user)
+        val newRefreshToken = jwtTokenPort.generateRefreshToken(user)
+
+        return AuthResponseDto(
+            token = newToken,
+            refreshToken = newRefreshToken,
+            userId = user.id!!,
+            displayName = user.displayName,
+            email = user.email
         )
     }
 }

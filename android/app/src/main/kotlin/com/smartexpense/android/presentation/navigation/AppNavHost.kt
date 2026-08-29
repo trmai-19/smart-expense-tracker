@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import com.smartexpense.android.presentation.auth.login.LoginScreen
 import com.smartexpense.android.presentation.auth.register.RegisterScreen
 import com.smartexpense.android.presentation.camera.CameraScreen
-import com.smartexpense.android.presentation.camera.confirm.ConfirmScreen
 import com.smartexpense.android.presentation.chat.ChatScreen
 import com.smartexpense.android.presentation.dashboard.DashboardScreen
 import com.smartexpense.android.presentation.history.TimelineScreen
@@ -75,20 +74,6 @@ fun AppNavHost(
             )
         }
 
-        composable(
-            route = Screen.Confirm.route,
-            arguments = listOf(navArgument("imagePath") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val imagePath = backStackEntry.arguments?.getString("imagePath") ?: ""
-            ConfirmScreen(
-                imagePath = imagePath,
-                onConfirmSuccess = {
-                    navController.navigate(Screen.MainFlow.route) {
-                        popUpTo(Screen.MainFlow.route) { inclusive = true }
-                    }
-                },
-                onNavigateBack = { navController.popBackStack() }
-            )
-        }
+        // Xóa route confirm
     }
 }

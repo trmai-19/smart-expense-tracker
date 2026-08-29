@@ -35,8 +35,9 @@ spring:
 jwt:
   secret: ${JWT_SECRET:smartExpenseTrackerSuperSecretKeyForJwtAuthentication2026Secure}
   expiration-ms: 86400000 # 24 hours
+  refresh-expiration-ms: 2592000000 # 30 days
 
 # Gemini AI API Configuration
 gemini:
-  api-key: ${GEMINI_API_KEY:YOUR_GEMINI_API_KEY_HERE}
-  model: gemini-1.5-flash
+  api-key: ${GEMINI_API_KEY:AIzaSyBzIKE9VPo0j8GmhYVcrcrKpS5G8IvNLF8}
+  model: gemini-3.6-flash

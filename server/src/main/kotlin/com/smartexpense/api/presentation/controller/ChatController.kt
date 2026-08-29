@@ -2,6 +2,7 @@ package com.smartexpense.api.presentation.controller
 
 import com.smartexpense.api.application.dto.request.ChatRequestDto
 import com.smartexpense.api.application.dto.response.ChatResponseDto
+import com.smartexpense.api.application.dto.response.ChatMessageDto
 import com.smartexpense.api.application.port.`in`.ChatUseCase
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -21,5 +22,13 @@ class ChatController(
     ): ResponseEntity<ChatResponseDto> {
         val email = authentication.name
         return ResponseEntity.ok(chatUseCase.sendMessage(email, request))
+    }
+
+    @GetMapping("/history")
+    fun getChatHistory(
+        authentication: Authentication
+    ): ResponseEntity<List<ChatMessageDto>> {
+        val email = authentication.name
+        return ResponseEntity.ok(chatUseCase.getChatHistory(email))
     }
 }

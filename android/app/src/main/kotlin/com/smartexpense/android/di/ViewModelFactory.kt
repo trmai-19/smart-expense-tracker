@@ -16,8 +16,11 @@ import com.smartexpense.android.data.repository.UserRepositoryImpl
 import com.smartexpense.android.domain.usecase.auth.LoginUseCase
 import com.smartexpense.android.domain.usecase.auth.RegisterUseCase
 import com.smartexpense.android.domain.usecase.chat.SendChatMessageUseCase
+import com.smartexpense.android.domain.usecase.chat.GetChatHistoryUseCase
+import com.smartexpense.android.domain.usecase.expense.AnalyzeExpenseUseCase
 import com.smartexpense.android.domain.usecase.expense.CreateExpenseUseCase
 import com.smartexpense.android.domain.usecase.expense.GetExpensesUseCase
+import com.smartexpense.android.domain.usecase.expense.GetStatisticsUseCase
 import com.smartexpense.android.domain.usecase.notification.GetNotificationsUseCase
 import com.smartexpense.android.domain.usecase.notification.MarkAllNotificationsReadUseCase
 import com.smartexpense.android.domain.usecase.notification.MarkNotificationReadUseCase
@@ -28,6 +31,7 @@ import com.smartexpense.android.presentation.chat.ChatViewModel
 import com.smartexpense.android.presentation.history.ExpenseViewModel
 import com.smartexpense.android.presentation.notification.NotificationViewModel
 import com.smartexpense.android.presentation.profile.ProfileViewModel
+import com.smartexpense.android.presentation.dashboard.DashboardViewModel
 
 class ViewModelFactory private constructor() : ViewModelProvider.Factory {
 
@@ -47,7 +51,12 @@ class ViewModelFactory private constructor() : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(ExpenseViewModel::class.java) -> {
                 val api = RetrofitClient.getClient().create(ExpenseApi::class.java)
                 val repo = ExpenseRepositoryImpl(api)
-                ExpenseViewModel(GetExpensesUseCase(repo), CreateExpenseUseCase(repo)) as T
+                ExpenseViewModel(GetExpensesUseCase(repo), CreateExpenseUseCase(repo), AnalyzeExpenseUseCase(repo), repo) as T
+            }
+            modelClass.isAssignableFrom(DashboardViewModel::class.java) -> {
+                val api = RetrofitClient.getClient().create(ExpenseApi::class.java)
+                val repo = ExpenseRepositoryImpl(api)
+                DashboardViewModel(GetStatisticsUseCase(repo)) as T
             }
             modelClass.isAssignableFrom(NotificationViewModel::class.java) -> {
                 val api = RetrofitClient.getClient().create(NotificationApi::class.java)
@@ -61,7 +70,7 @@ class ViewModelFactory private constructor() : ViewModelProvider.Factory {
             modelClass.isAssignableFrom(ChatViewModel::class.java) -> {
                 val api = RetrofitClient.getClient().create(ChatApi::class.java)
                 val repo = ChatRepositoryImpl(api)
-                ChatViewModel(SendChatMessageUseCase(repo)) as T
+                ChatViewModel(SendChatMessageUseCase(repo), GetChatHistoryUseCase(repo)) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

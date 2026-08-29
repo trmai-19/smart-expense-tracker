@@ -12,4 +12,7 @@ interface AuthApi {
 
     @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequestDto): AuthResponseDto
+
+    @POST("api/auth/refresh")
+    fun refreshToken(@Body request: com.smartexpense.android.data.remote.dto.request.RefreshTokenRequestDto): retrofit2.Call<AuthResponseDto>
 }

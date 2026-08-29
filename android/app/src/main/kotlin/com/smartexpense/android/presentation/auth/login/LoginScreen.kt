@@ -63,6 +63,7 @@ fun LoginScreen(
     LaunchedEffect(authSuccess) {
         authSuccess?.let { response ->
             UserManager.saveToken(context, response.token)
+            UserManager.saveRefreshToken(context, response.refreshToken)
             UserManager.setUserName(context, response.displayName)
             onLoginSuccess()
         }

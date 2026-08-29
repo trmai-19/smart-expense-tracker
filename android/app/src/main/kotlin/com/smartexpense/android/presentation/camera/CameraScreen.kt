@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,19 +37,21 @@ import coil.compose.AsyncImage
 import com.smartexpense.android.R
 import com.smartexpense.android.di.ViewModelFactory
 import com.smartexpense.android.presentation.profile.ProfileViewModel
+import com.smartexpense.android.presentation.history.ExpenseViewModel
 import com.smartexpense.android.ui.theme.*
 import java.io.File
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.Executors
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CameraScreen(
     verticalPagerState: androidx.compose.foundation.pager.PagerState,
     expenses: List<com.smartexpense.android.data.remote.dto.response.ExpenseResponseDto>,
-    onCaptureConfirm: (String) -> Unit,
+    expenseViewModel: ExpenseViewModel,
     profileViewModel: ProfileViewModel = viewModel(factory = ViewModelFactory.getInstance())
 ) {
     val context = LocalContext.current
@@ -54,6 +59,60 @@ fun CameraScreen(
     val accentColor = LocalAccentColor.current
 
     val userProfile by profileViewModel.userProfile.observeAsState(null)
+    
+    // States for Confirm Flow
+    // 0: Camera, 1: Caption input, 2: Loading AI, 3: Confirm Form
+    var captureState by remember { mutableIntStateOf(0) }
+    var capturedImagePath by remember { mutableStateOf<String?>(null) }
+    
+    var amount by remember { mutableStateOf("") }
+    var caption by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("Khác") }
+    var amountError by remember { mutableStateOf<String?>(null) }
+    var serverPhotoUrl by remember { mutableStateOf("") }
+
+    val baseCategories = remember { mutableStateListOf("Ăn uống", "Di chuyển", "Mua sắm", "Giải trí", "Sức khỏe", "Hóa đơn", "Giáo dục", "Khác") }
+
+    val createSuccess by expenseViewModel.createSuccess.observeAsState()
+    val isLoading by expenseViewModel.isLoading.observeAsState(false)
+    val analyzeResult by expenseViewModel.analyzeResult.observeAsState()
+
+    LaunchedEffect(analyzeResult) {
+        if (captureState == 2 && analyzeResult != null) {
+            val res = analyzeResult!!
+            if (res.amount > 0) amount = res.amount.toString()
+            if (res.category.isNotBlank()) {
+                val cat = res.category.take(20)
+                if (!baseCategories.contains(cat)) {
+                    baseCategories.add(0, cat)
+                }
+                selectedCategory = cat
+            }
+            if (res.photoUrl.isNotBlank()) serverPhotoUrl = res.photoUrl
+            captureState = 3 // move to form
+        }
+    }
+
+    val error by expenseViewModel.error.observeAsState()
+    LaunchedEffect(error) {
+        if (error != null) {
+            android.widget.Toast.makeText(context, error, android.widget.Toast.LENGTH_LONG).show()
+            if (captureState == 2 || captureState == 3) {
+                captureState = 1 // Quay lại màn hình nhập caption
+            }
+            expenseViewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(createSuccess) {
+        if (createSuccess == true && captureState == 3) {
+            captureState = 0 // return to camera
+            capturedImagePath = null
+            caption = ""
+            amount = ""
+            // UI will automatically update history because ExpenseViewModel fetches on success
+        }
+    }
 
     LaunchedEffect(Unit) {
         profileViewModel.fetchProfile()
@@ -77,15 +136,19 @@ fun CameraScreen(
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { onCaptureConfirm(it.toString()) }
+        uri?.let { 
+            capturedImagePath = it.toString()
+            serverPhotoUrl = it.toString()
+            amount = ""
+            selectedCategory = "Khác"
+            caption = ""
+            captureState = 1
+        }
     }
 
     LaunchedEffect(Unit) {
         if (!hasCameraPermission) permissionLauncher.launch(Manifest.permission.CAMERA)
     }
-
-    // Layout: page 0 = camera, page 1..N = history (newest first)
-    // Swipe UP (finger bottom→top) goes from page 0 to page 1 = newest expense
 
     androidx.compose.foundation.pager.VerticalPager(
         state = verticalPagerState,
@@ -97,10 +160,12 @@ fun CameraScreen(
             // ── Camera page ────────────────────────────────────────────
             if (hasCameraPermission) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .imePadding(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Camera Preview (top, fills most of the screen)
+                    // Camera Preview or Captured Image (top, fills most of the screen)
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -108,100 +173,325 @@ fun CameraScreen(
                             .padding(horizontal = 24.dp)
                             .clip(RoundedCornerShape(40.dp))
                     ) {
-                        key(lensFacing) {
-                            AndroidView(
-                                factory = { ctx ->
-                                    val previewView = PreviewView(ctx)
-                                    val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
-                                    cameraProviderFuture.addListener({
-                                        val cameraProvider = cameraProviderFuture.get()
-                                        val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
-                                        val capture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
-                                        imageCapture = capture
-                                        val selector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-                                        try {
-                                            cameraProvider.unbindAll()
-                                            cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
-                                        } catch (e: Exception) { e.printStackTrace() }
-                                    }, ContextCompat.getMainExecutor(ctx))
-                                    previewView
-                                },
+                        if (captureState == 0) {
+                            // Live Camera Preview
+                            key(lensFacing) {
+                                AndroidView(
+                                    factory = { ctx ->
+                                        val previewView = PreviewView(ctx)
+                                        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                                        cameraProviderFuture.addListener({
+                                            val cameraProvider = cameraProviderFuture.get()
+                                            val preview = Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
+                                            val capture = ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
+                                            imageCapture = capture
+                                            val selector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
+                                            try {
+                                                cameraProvider.unbindAll()
+                                                cameraProvider.bindToLifecycle(lifecycleOwner, selector, preview, capture)
+                                            } catch (e: Exception) { e.printStackTrace() }
+                                        }, ContextCompat.getMainExecutor(ctx))
+                                        previewView
+                                    },
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        } else {
+                            // Captured Image Overlay
+                            AsyncImage(
+                                model = Uri.parse(capturedImagePath),
+                                contentDescription = "Captured preview",
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
                             )
-                        }
-                    }
-
-                    // Controls row (gallery | capture | flip) – below preview, all 3 in same row
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Gallery
-                        IconButton(
-                            onClick = { galleryLauncher.launch("image/*") },
-                            modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
-                        ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = Color.White, modifier = Modifier.size(24.dp))
-                        }
-
-                        // Capture button
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(64.dp)
-                                .clip(CircleShape)
-                                .background(Color.White.copy(alpha = 0.1f))
-                                .border(2.dp, accentColor.copy(alpha = 0.6f), CircleShape)
-                                .clickable(enabled = !isCapturing) {
-                                    val capture = imageCapture ?: return@clickable
-                                    isCapturing = true
-                                    val outputDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES) ?: context.filesDir
-                                    val photoFile = File(outputDir, "SET_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg")
-                                    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-                                    val executor = Executors.newSingleThreadExecutor()
-                                    capture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
-                                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                                            isCapturing = false
-                                            onCaptureConfirm(Uri.fromFile(photoFile).toString())
-                                        }
-                                        override fun onError(e: ImageCaptureException) { isCapturing = false }
-                                    })
-                                }
-                        ) {
-                            Box(
+                            
+                            // Close Button (Cancel)
+                            IconButton(
+                                onClick = { 
+                                    captureState = 0
+                                    
+                                    // Delete server file if exists
+                                    analyzeResult?.photoUrl?.let { url ->
+                                        expenseViewModel.deleteFile(url)
+                                    }
+                                    
+                                    // Delete local file
+                                    capturedImagePath?.let { path ->
+                                        try {
+                                            val uri = android.net.Uri.parse(path)
+                                            if (uri.scheme == "file") {
+                                                java.io.File(uri.path!!).delete()
+                                            }
+                                        } catch (e: Exception) { e.printStackTrace() }
+                                    }
+                                    
+                                    capturedImagePath = null
+                                    
+                                    // Clear states
+                                    caption = ""
+                                    amount = ""
+                                    selectedCategory = "Khác"
+                                },
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isCapturing) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.8f))
-                            )
-                        }
+                                    .padding(16.dp)
+                                    .align(Alignment.TopStart)
+                                    .background(Color.Black.copy(alpha = 0.4f), CircleShape)
+                            ) {
+                                Icon(Icons.Default.Close, "Cancel", tint = Color.White)
+                            }
 
-                        // Flip camera
-                        IconButton(
-                            onClick = {
-                                lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
-                            },
-                            modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
-                        ) {
-                            Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = Color.White, modifier = Modifier.size(24.dp))
+                            // State 2: Loading Overlay (Phải đặt trước Caption để Caption không bị làm mờ)
+                            if (captureState == 2) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        CircularProgressIndicator(color = accentColor)
+                                        Spacer(Modifier.height(8.dp))
+                                        Text("AI đang xử lý...", color = Color.White, style = MaterialTheme.typography.labelMedium)
+                                    }
+                                }
+                            }
+
+                            // State 1, 2, 3: Caption Display (Đè lên ảnh)
+                            if (captureState in 1..3 && (captureState == 1 || caption.isNotEmpty())) {
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 24.dp, start = 24.dp, end = 24.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(32.dp))
+                                        .background(Color.Black.copy(alpha = 0.5f))
+                                        .padding(horizontal = 20.dp, vertical = 14.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (captureState == 1) {
+                                        androidx.compose.foundation.text.BasicTextField(
+                                            value = caption,
+                                            onValueChange = { if (it.length <= 60) caption = it },
+                                            textStyle = androidx.compose.ui.text.TextStyle(
+                                                color = Color.White,
+                                                fontSize = androidx.compose.ui.unit.TextUnit(16f, androidx.compose.ui.unit.TextUnitType.Sp),
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                fontWeight = FontWeight.Medium
+                                            ),
+                                            modifier = Modifier.fillMaxWidth(),
+                                            decorationBox = { innerTextField ->
+                                                if (caption.isEmpty()) {
+                                                    Text(
+                                                        text = "caption ...",
+                                                        color = Color.White.copy(alpha = 0.6f),
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
+                                                    )
+                                                }
+                                                innerTextField()
+                                            },
+                                            maxLines = 2,
+                                            cursorBrush = androidx.compose.ui.graphics.SolidColor(Color.White)
+                                        )
+                                    } else {
+                                        Text(
+                                            text = caption,
+                                            color = Color.White,
+                                            fontSize = androidx.compose.ui.unit.TextUnit(16f, androidx.compose.ui.unit.TextUnitType.Sp),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    // "Lịch sử ↑" hint at the very bottom
-                    if (expenses.isNotEmpty()) {
+                    // Form Container when State is 3 (Appears below the image)
+                    if (captureState == 3) {
                         Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text("Lịch sử", color = Color.White, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold))
-                            Icon(Icons.Default.KeyboardArrowUp, "Up arrow", tint = Color.White, modifier = Modifier.size(20.dp))
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = amount,
+                                    onValueChange = { amount = it; amountError = null },
+                                    label = { Text("Số tiền (VNĐ)") },
+                                    isError = amountError != null,
+                                    supportingText = amountError?.let { { Text(it) } },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = accentColor, unfocusedBorderColor = SurfaceCard,
+                                        focusedLabelColor = accentColor, cursorColor = accentColor
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true
+                                )
+
+                                var expanded by remember { mutableStateOf(false) }
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = it }
+                                ) {
+                                    OutlinedTextField(
+                                        value = selectedCategory,
+                                        onValueChange = {},
+                                        readOnly = true,
+                                        label = { Text("Danh mục") },
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = accentColor, unfocusedBorderColor = SurfaceCard,
+                                            focusedLabelColor = accentColor, cursorColor = accentColor
+                                        ),
+                                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                                    )
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
+                                    ) {
+                                        baseCategories.forEach { cat ->
+                                            DropdownMenuItem(
+                                                text = { Text(cat) },
+                                                onClick = {
+                                                    selectedCategory = cat
+                                                    expanded = false
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Circular Save Button
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                                    .background(accentColor)
+                                    .clickable(enabled = !isLoading) {
+                                        val amtLong = amount.replace(",", "").replace(".", "").toLongOrNull()
+                                        if (amtLong == null || amtLong <= 0) {
+                                            amountError = "Vui lòng nhập số hợp lệ"
+                                            return@clickable
+                                        }
+                                        expenseViewModel.createExpense(
+                                            amount = amtLong.toDouble(),
+                                            category = selectedCategory,
+                                            photoUrl = serverPhotoUrl,
+                                            caption = caption.ifBlank { "" },
+                                            expenseDate = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                                        )
+                                    }
+                            ) {
+                                if (isLoading) {
+                                    CircularProgressIndicator(color = Background, modifier = Modifier.size(24.dp))
+                                } else {
+                                    Icon(Icons.Default.Check, "Lưu", tint = Background, modifier = Modifier.size(32.dp))
+                                }
+                            }
                         }
-                    } else {
-                        Spacer(modifier = Modifier.height(32.dp))
+                    } else if (captureState in 0..2) {
+                        // Controls row (gallery | capture | flip)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 40.dp, vertical = 16.dp),
+                            horizontalArrangement = if (captureState in 1..2) Arrangement.Center else Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (captureState == 0) {
+                                // Gallery
+                                IconButton(
+                                    onClick = { galleryLauncher.launch("image/*") },
+                                    modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
+                                ) {
+                                    Icon(ImageVector.vectorResource(R.drawable.ic_gallery), "Gallery", tint = Color.White, modifier = Modifier.size(24.dp))
+                                }
+                            }
+
+                            // Capture or Send button
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(72.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (captureState == 1) accentColor
+                                        else if (captureState == 2) accentColor.copy(alpha = 0.5f)
+                                        else Color.White.copy(alpha = 0.1f)
+                                    )
+                                    .border(2.dp, if (captureState in 1..2) Color.Transparent else accentColor.copy(alpha = 0.6f), CircleShape)
+                                    .clickable(enabled = !isCapturing && captureState in 0..1) {
+                                        if (captureState == 1) {
+                                            captureState = 2
+                                            expenseViewModel.analyzeExpense(capturedImagePath!!, caption)
+                                        } else {
+                                            val capture = imageCapture ?: return@clickable
+                                            isCapturing = true
+                                            val outputDir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES) ?: context.filesDir
+                                            val photoFile = File(outputDir, "SET_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg")
+                                            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+                                            val executor = ContextCompat.getMainExecutor(context)
+                                            capture.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
+                                                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                                                    isCapturing = false
+                                                    capturedImagePath = Uri.fromFile(photoFile).toString()
+                                                    serverPhotoUrl = capturedImagePath!!
+                                                    captureState = 1 // enter caption state
+                                                }
+                                                override fun onError(e: ImageCaptureException) { isCapturing = false }
+                                            })
+                                        }
+                                    }
+                            ) {
+                                if (captureState in 1..2) {
+                                    if (captureState == 2) {
+                                        CircularProgressIndicator(color = Background, modifier = Modifier.size(28.dp), strokeWidth = 3.dp)
+                                    } else {
+                                        Icon(Icons.Default.Send, "Gửi", tint = Background, modifier = Modifier.size(32.dp))
+                                    }
+                                } else {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(56.dp)
+                                            .clip(CircleShape)
+                                            .background(if (isCapturing) Color.White.copy(alpha = 0.3f) else Color.White.copy(alpha = 0.8f))
+                                    )
+                                }
+                            }
+
+                            if (captureState == 0) {
+                                // Flip camera
+                                IconButton(
+                                    onClick = {
+                                        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK) CameraSelector.LENS_FACING_FRONT else CameraSelector.LENS_FACING_BACK
+                                    },
+                                    modifier = Modifier.size(48.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))
+                                ) {
+                                    Icon(ImageVector.vectorResource(R.drawable.ic_flip_camera), "Flip camera", tint = Color.White, modifier = Modifier.size(24.dp))
+                                }
+                            }
+                        }
+
+                        // "Lịch sử ↑" hint at the very bottom
+                        if (expenses.isNotEmpty()) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Text("Lịch sử", color = Color.White, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold))
+                                Icon(Icons.Default.KeyboardArrowUp, "Up arrow", tint = Color.White, modifier = Modifier.size(20.dp))
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.height(32.dp))
+                        }
                     }
                 }
             } else {
@@ -242,14 +532,13 @@ private fun HistoryCard(
     avatarUrl: String?
 ) {
     val imageUrl = if (expense.photoUrl.startsWith("http")) expense.photoUrl
-                   else "${com.smartexpense.android.data.remote.RetrofitClient.BASE_URL}${expense.photoUrl}"
+                   else "${com.smartexpense.android.data.remote.RetrofitClient.BASE_URL.removeSuffix("/")}${if (expense.photoUrl.startsWith("/")) expense.photoUrl else "/${expense.photoUrl}"}"
 
     val formattedAmount = java.text.DecimalFormat(
         "#,###",
         java.text.DecimalFormatSymbols(java.util.Locale("vi", "VN")).apply { groupingSeparator = '.' }
     ).format(expense.amount.toLong()) + " đ"
 
-    // Parse expenseDate: ISO format "yyyy-MM-dd'T'HH:mm:ss" or "yyyy-MM-dd"
     val dateText = remember(expense.expenseDate) {
         runCatching {
             val formats = listOf(
@@ -274,7 +563,6 @@ private fun HistoryCard(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Photo Card
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -290,7 +578,6 @@ private fun HistoryCard(
                 contentScale = androidx.compose.ui.layout.ContentScale.Crop
             )
 
-            // Caption Pill
             if (!expense.caption.isNullOrEmpty()) {
                 Text(
                     text = expense.caption,
@@ -305,7 +592,6 @@ private fun HistoryCard(
             }
         }
 
-        // User Info row
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -328,7 +614,6 @@ private fun HistoryCard(
                         modifier = Modifier.fillMaxSize().clip(CircleShape)
                     )
                 } else {
-                    // Fallback: accent circle
                     Box(
                         modifier = Modifier
                             .size(20.dp)
@@ -347,7 +632,6 @@ private fun HistoryCard(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Meta Info
         Text(
             text = androidx.compose.ui.text.buildAnnotatedString {
                 append("${expense.category} · $dateText · ")

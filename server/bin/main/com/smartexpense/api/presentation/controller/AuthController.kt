@@ -28,4 +28,10 @@ class AuthController(
         val response = authUseCase.register(request)
         return ResponseEntity.ok(response)
     }
+
+    @PostMapping("/refresh")
+    fun refresh(@Valid @RequestBody request: com.smartexpense.api.application.dto.request.RefreshTokenRequestDto): ResponseEntity<AuthResponseDto> {
+        val response = authUseCase.refreshToken(request)
+        return ResponseEntity.ok(response)
+    }
 }

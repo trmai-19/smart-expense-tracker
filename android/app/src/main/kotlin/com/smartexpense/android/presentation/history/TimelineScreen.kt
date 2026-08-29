@@ -78,7 +78,7 @@ fun TimelineScreen(
                 val expense = filtered.getOrNull(page - 1)
                 if (expense != null) {
                     val imageUrl = if (expense.photoUrl.startsWith("http")) expense.photoUrl 
-                                   else "${RetrofitClient.BASE_URL}${expense.photoUrl}"
+                                   else "${RetrofitClient.BASE_URL.removeSuffix("/")}${if (expense.photoUrl.startsWith("/")) expense.photoUrl else "/${expense.photoUrl}"}"
                     
                     Box(modifier = Modifier.fillMaxSize()) {
                         AsyncImage(

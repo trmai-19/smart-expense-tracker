@@ -19,7 +19,4 @@ sealed class Screen(val route: String) {
 
     // ─── Full Screen ──────────────────────────────────────────────
     data object Profile : Screen("profile")
-    data object Confirm : Screen("confirm/{imagePath}") {
-        fun createRoute(imagePath: String) = "confirm/$imagePath"
-    }
 }

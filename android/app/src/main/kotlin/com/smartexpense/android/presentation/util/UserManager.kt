@@ -15,6 +15,7 @@ object UserManager {
     private const val KEY_STREAK_DAYS = "key_streak_days"
     private const val KEY_TOTAL_BILLS = "key_total_bills"
     private const val KEY_AUTH_TOKEN = "key_auth_token"
+    private const val KEY_REFRESH_TOKEN = "key_auth_refresh_token"
 
     private const val DEFAULT_USER_NAME = "Nguyễn Văn A"
     private const val DEFAULT_USER_EMAIL = "user@smartexpense.app"
@@ -27,14 +28,27 @@ object UserManager {
         prefs.edit().putString(KEY_AUTH_TOKEN, token).apply()
     }
 
+    fun saveRefreshToken(context: Context, token: String) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_REFRESH_TOKEN, token).apply()
+    }
+
     fun getToken(context: Context): String? {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         return prefs.getString(KEY_AUTH_TOKEN, null)
     }
 
+    fun getRefreshToken(context: Context): String? {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_REFRESH_TOKEN, null)
+    }
+
     fun clearToken(context: Context) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().remove(KEY_AUTH_TOKEN).apply()
+        prefs.edit()
+            .remove(KEY_AUTH_TOKEN)
+            .remove(KEY_REFRESH_TOKEN)
+            .apply()
     }
 
     fun getUserName(context: Context?): String {

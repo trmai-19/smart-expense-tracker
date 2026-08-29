@@ -16,9 +16,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.smartexpense.android.data.remote.dto.response.ExpenseResponseDto
+import com.smartexpense.android.data.remote.dto.response.BarEntryDto
 import com.smartexpense.android.di.ViewModelFactory
-import com.smartexpense.android.presentation.history.ExpenseViewModel
 import com.smartexpense.android.ui.theme.*
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -27,105 +26,15 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-private enum class PeriodTab { WEEK, MONTH, YEAR, CUSTOM }
-
-// ── Data helpers ───────────────────────────────────────────────────────────────
-
-private fun parseDate(dateStr: String): Date? {
-    val formats = listOf(
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()),
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault()),
-        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    )
-    return formats.firstNotNullOfOrNull { fmt -> runCatching { fmt.parse(dateStr) }.getOrNull() }
+private enum class PeriodTab(val id: String, val title: String) {
+    WEEK("WEEK", "Tuần"),
+    MONTH("MONTH", "Tháng"),
+    YEAR("YEAR", "Năm"),
+    CUSTOM("CUSTOM", "Tùy chọn")
 }
 
-private data class BarEntry(val label: String, val amount: Double)
-
-private fun buildWeekBars(expenses: List<ExpenseResponseDto>): List<BarEntry> {
-    val cal = Calendar.getInstance()
-    val today = cal.time
-    val dayFmt = SimpleDateFormat("E", Locale("vi", "VN"))
-    val bars = (6 downTo 0).map { offset ->
-        val c = Calendar.getInstance().apply { time = today; add(Calendar.DAY_OF_YEAR, -offset) }
-        val dayStart = Calendar.getInstance().apply { time = c.time; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.time
-        val dayEnd = Calendar.getInstance().apply { time = dayStart; add(Calendar.DAY_OF_YEAR, 1) }.time
-        val label = dayFmt.format(dayStart).replaceFirstChar { it.uppercase() }
-        val total = expenses.filter { e ->
-            val d = parseDate(e.expenseDate) ?: return@filter false
-            d >= dayStart && d < dayEnd
-        }.sumOf { it.amount.toDouble() }
-        BarEntry(label, total)
-    }
-    return bars
-}
-
-private fun buildMonthBars(expenses: List<ExpenseResponseDto>): List<BarEntry> {
-    val cal = Calendar.getInstance()
-    val today = cal.time
-    // Group last 30 days by week (4 weeks + remainder)
-    val bars = (3 downTo 0).map { weekOffset ->
-        val weekEnd = Calendar.getInstance().apply { time = today; add(Calendar.DAY_OF_YEAR, -weekOffset * 7) }.time
-        val weekStart = Calendar.getInstance().apply { time = weekEnd; add(Calendar.DAY_OF_YEAR, -6) }.time
-        val label = "T${4 - weekOffset}"
-        val total = expenses.filter { e ->
-            val d = parseDate(e.expenseDate) ?: return@filter false
-            d >= weekStart && d <= weekEnd
-        }.sumOf { it.amount.toDouble() }
-        BarEntry(label, total)
-    }
-    return bars
-}
-
-private fun buildYearBars(expenses: List<ExpenseResponseDto>, year: Int): List<BarEntry> {
-    val monthLabels = listOf("T1","T2","T3","T4","T5","T6","T7","T8","T9","T10","T11","T12")
-    return (0..11).map { month ->
-        val total = expenses.filter { e ->
-            val d = parseDate(e.expenseDate) ?: return@filter false
-            val c = Calendar.getInstance().apply { time = d }
-            c.get(Calendar.YEAR) == year && c.get(Calendar.MONTH) == month
-        }.sumOf { it.amount.toDouble() }
-        BarEntry(monthLabels[month], total)
-    }
-}
-
-private fun buildCustomBars(expenses: List<ExpenseResponseDto>, from: Date, to: Date): List<BarEntry> {
-    val diffMs = to.time - from.time
-    val diffDays = (diffMs / (1000 * 60 * 60 * 24)).toInt().coerceAtLeast(1)
-    return if (diffDays <= 31) {
-        // Daily bars
-        (0..diffDays).map { offset ->
-            val dayStart = Calendar.getInstance().apply { time = from; add(Calendar.DAY_OF_YEAR, offset); set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0) }.time
-            val dayEnd = Calendar.getInstance().apply { time = dayStart; add(Calendar.DAY_OF_YEAR, 1) }.time
-            val label = SimpleDateFormat("dd/M", Locale.getDefault()).format(dayStart)
-            val total = expenses.filter { e ->
-                val d = parseDate(e.expenseDate) ?: return@filter false
-                d >= dayStart && d < dayEnd
-            }.sumOf { it.amount.toDouble() }
-            BarEntry(label, total)
-        }
-    } else {
-        // Monthly bars
-        val startCal = Calendar.getInstance().apply { time = from; set(Calendar.DAY_OF_MONTH, 1) }
-        val endCal = Calendar.getInstance().apply { time = to }
-        val result = mutableListOf<BarEntry>()
-        while (!startCal.after(endCal)) {
-            val monthStart = startCal.time
-            val monthEnd = Calendar.getInstance().apply { time = monthStart; add(Calendar.MONTH, 1) }.time
-            val label = "${startCal.get(Calendar.MONTH) + 1}/${startCal.get(Calendar.YEAR) % 100}"
-            val total = expenses.filter { e ->
-                val d = parseDate(e.expenseDate) ?: return@filter false
-                d >= monthStart && d < monthEnd
-            }.sumOf { it.amount.toDouble() }
-            result.add(BarEntry(label, total))
-            startCal.add(Calendar.MONTH, 1)
-        }
-        result
-    }
-}
-
-// ── Date Range Picker (Year > Month > Day) ─────────────────────────────────────
-
+// ── Date Range Picker ────────────────────────────────────────────────────────
+// (Giữ nguyên logic DatePicker cũ)
 private enum class DatePickerLevel { YEAR, MONTH, DAY }
 
 @Composable
@@ -138,7 +47,7 @@ private fun DateRangePicker(
 
     var fromDate by remember { mutableStateOf<Date?>(null) }
     var toDate by remember { mutableStateOf<Date?>(null) }
-    var pickingFrom by remember { mutableStateOf(true) } // true = picking from, false = picking to
+    var pickingFrom by remember { mutableStateOf(true) }
 
     var level by remember { mutableStateOf(DatePickerLevel.YEAR) }
     var selectedYear by remember { mutableIntStateOf(currentYear) }
@@ -158,7 +67,6 @@ private fun DateRangePicker(
                     color = OnBackground
                 )
                 Spacer(Modifier.height(4.dp))
-                // Breadcrumb
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (level != DatePickerLevel.YEAR) {
                         Text(
@@ -232,7 +140,6 @@ private fun DateRangePicker(
                     val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
                     val firstDayOfWeek = (cal.get(Calendar.DAY_OF_WEEK) - 2).let { if (it < 0) 6 else it }
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        // Day labels
                         Row {
                             listOf("T2","T3","T4","T5","T6","T7","CN").forEach { d ->
                                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -240,7 +147,6 @@ private fun DateRangePicker(
                                 }
                             }
                         }
-                        // Day cells
                         val cells = mutableListOf<Int?>()
                         repeat(firstDayOfWeek) { cells.add(null) }
                         (1..daysInMonth).forEach { cells.add(it) }
@@ -307,11 +213,11 @@ private fun sameDay(a: Date, b: Date): Boolean {
 
 @Composable
 private fun BarChart(
-    bars: List<BarEntry>,
+    bars: List<BarEntryDto>,
     accentBrush: androidx.compose.ui.graphics.Brush
 ) {
     if (bars.isEmpty()) return
-    val maxVal = bars.maxOf { it.amount }.takeIf { it > 0 } ?: 1.0
+    val maxVal = bars.maxOf { it.amount }.takeIf { it > 0.0 } ?: 1.0
 
     Row(
         modifier = Modifier
@@ -357,72 +263,36 @@ private fun BarChart(
 
 @Composable
 fun DashboardScreen(
-    expenseViewModel: ExpenseViewModel = viewModel(factory = ViewModelFactory.getInstance())
+    dashboardViewModel: DashboardViewModel = viewModel(factory = ViewModelFactory.getInstance())
 ) {
     val accentColor = LocalAccentColor.current
     val accentBrush = LocalAccentBrush.current
-    val expensesState by expenseViewModel.expenses.observeAsState(emptyList())
-    val expenses = expensesState ?: emptyList()
 
-    LaunchedEffect(Unit) { expenseViewModel.fetchExpenses() }
+    val stats by dashboardViewModel.statistics.observeAsState()
+    val isLoading by dashboardViewModel.isLoading.observeAsState(false)
 
     var selectedTab by remember { mutableStateOf(PeriodTab.MONTH) }
     var showDatePicker by remember { mutableStateOf(false) }
     var customFrom by remember { mutableStateOf<Date?>(null) }
     var customTo by remember { mutableStateOf<Date?>(null) }
-
-    val tabs = listOf(PeriodTab.WEEK to "Tuần", PeriodTab.MONTH to "Tháng", PeriodTab.YEAR to "Năm", PeriodTab.CUSTOM to "Tùy chọn")
     val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+    val isoFmt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
 
-    val filteredExpenses = remember(expenses, selectedTab, customFrom, customTo) {
-        when (selectedTab) {
-            PeriodTab.WEEK -> {
-                val cutoff = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -7) }.time
-                expenses.filter { e -> parseDate(e.expenseDate)?.after(cutoff) == true }
-            }
-            PeriodTab.MONTH -> {
-                val cal = Calendar.getInstance()
-                expenses.filter { e ->
-                    val d = parseDate(e.expenseDate) ?: return@filter false
-                    val c = Calendar.getInstance().apply { time = d }
-                    c.get(Calendar.YEAR) == cal.get(Calendar.YEAR) && c.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
-                }
-            }
-            PeriodTab.YEAR -> {
-                expenses.filter { e ->
-                    val d = parseDate(e.expenseDate) ?: return@filter false
-                    Calendar.getInstance().apply { time = d }.get(Calendar.YEAR) == currentYear
-                }
-            }
-            PeriodTab.CUSTOM -> {
-                val from = customFrom; val to = customTo
-                if (from != null && to != null)
-                    expenses.filter { e -> val d = parseDate(e.expenseDate) ?: return@filter false; d >= from && d <= to }
-                else expenses
-            }
+    // Lần đầu mở màn hình hoặc đổi tab (trừ CUSTOM), fetch dữ liệu
+    LaunchedEffect(selectedTab) {
+        if (selectedTab != PeriodTab.CUSTOM) {
+            dashboardViewModel.fetchStatistics(selectedTab.id)
         }
     }
-
-    val bars = remember(filteredExpenses, selectedTab, customFrom, customTo) {
-        when (selectedTab) {
-            PeriodTab.WEEK -> buildWeekBars(expenses)
-            PeriodTab.MONTH -> buildMonthBars(expenses)
-            PeriodTab.YEAR -> buildYearBars(expenses, currentYear)
-            PeriodTab.CUSTOM -> {
-                val from = customFrom; val to = customTo
-                if (from != null && to != null) buildCustomBars(expenses, from, to) else emptyList()
-            }
-        }
-    }
-
-    val totalAmount = filteredExpenses.sumOf { it.amount.toDouble() }
-    val byCategory = filteredExpenses.groupBy { it.category }
-        .mapValues { (_, list) -> list.sumOf { it.amount.toDouble() } }
-        .entries.sortedByDescending { it.value }
 
     if (showDatePicker) {
         DateRangePicker(
-            onConfirm = { from, to -> customFrom = from; customTo = to; showDatePicker = false },
+            onConfirm = { from, to -> 
+                customFrom = from
+                customTo = to
+                showDatePicker = false
+                dashboardViewModel.fetchStatistics(PeriodTab.CUSTOM.id, isoFmt.format(from), isoFmt.format(to))
+            },
             onDismiss = { showDatePicker = false }
         )
     }
@@ -438,7 +308,7 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth().height(44.dp)
                     .background(SurfaceCard, RoundedCornerShape(50))
             ) {
-                tabs.forEach { (tab, title) ->
+                PeriodTab.values().forEach { tab ->
                     val selected = selectedTab == tab
                     Box(
                         modifier = Modifier
@@ -452,7 +322,7 @@ fun DashboardScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = title,
+                            text = tab.title,
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = if (selected) Background else OnSurfaceMuted
                         )
@@ -473,6 +343,25 @@ fun DashboardScreen(
             }
         }
 
+        if (isLoading) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = accentColor)
+                }
+            }
+            return@LazyColumn
+        }
+
+        val safeStats = stats
+        if (safeStats == null) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
+                    Text("Chưa có dữ liệu", color = OnSurfaceMuted)
+                }
+            }
+            return@LazyColumn
+        }
+
         // ── Total card ───────────────────────────────────────────────────
         item {
             Card(
@@ -489,9 +378,7 @@ fun DashboardScreen(
                     }
                     Text("Tổng chi tiêu $periodLabel", style = MaterialTheme.typography.bodyMedium, color = OnSurfaceMuted)
                     Spacer(Modifier.height(4.dp))
-                    Text(formatVnd(totalAmount.toLong()), style = MaterialTheme.typography.displayMedium.copy(brush = accentBrush))
-                    Spacer(Modifier.height(4.dp))
-                    Text("${filteredExpenses.size} giao dịch", style = MaterialTheme.typography.bodySmall, color = OnSurfaceDim)
+                    Text(formatVnd(safeStats.totalAmount.toLong()), style = MaterialTheme.typography.displayMedium.copy(brush = accentBrush))
                 }
             }
         }
@@ -512,32 +399,32 @@ fun DashboardScreen(
                     }
                     Text(chartTitle, style = MaterialTheme.typography.titleSmall, color = OnBackground)
                     Spacer(Modifier.height(16.dp))
-                    if (bars.isEmpty()) {
+                    if (safeStats.bars.isEmpty()) {
                         Box(modifier = Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
                             Text("Chưa có dữ liệu", color = OnSurfaceMuted)
                         }
                     } else {
-                        BarChart(bars = bars, accentBrush = accentBrush)
+                        BarChart(bars = safeStats.bars, accentBrush = accentBrush)
                     }
                 }
             }
         }
 
         // ── Category breakdown ───────────────────────────────────────────
-        if (byCategory.isNotEmpty()) {
+        if (safeStats.categories.isNotEmpty()) {
             item {
                 Text("Phân loại chi tiêu", style = MaterialTheme.typography.titleMedium, color = OnBackground)
             }
-            items(byCategory.size) { index ->
-                val (category, amount) = byCategory[index]
-                val pct = if (totalAmount > 0) (amount / totalAmount).toFloat() else 0f
+            items(safeStats.categories.size) { index ->
+                val catDto = safeStats.categories[index]
+                val pct = if (safeStats.totalAmount > 0) (catDto.amount / safeStats.totalAmount).toFloat() else 0f
                 Column(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
                         .background(SurfaceCard).padding(16.dp)
                 ) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("$category (${(pct * 100).toInt()}%)", style = MaterialTheme.typography.bodyMedium, color = OnSurface)
-                        Text(formatVnd(amount.toLong()), style = MaterialTheme.typography.bodyMedium, color = accentColor, fontWeight = FontWeight.SemiBold)
+                        Text("${catDto.category} (${(pct * 100).toInt()}%)", style = MaterialTheme.typography.bodyMedium, color = OnSurface)
+                        Text(formatVnd(catDto.amount.toLong()), style = MaterialTheme.typography.bodyMedium, color = accentColor, fontWeight = FontWeight.SemiBold)
                     }
                     Spacer(Modifier.height(8.dp))
                     Box(modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(Surface)) {
@@ -548,7 +435,7 @@ fun DashboardScreen(
         } else {
             item {
                 Box(modifier = Modifier.fillMaxWidth().padding(40.dp), contentAlignment = Alignment.Center) {
-                    Text("Chưa có dữ liệu", color = OnSurfaceMuted)
+                    Text("Chưa có dữ liệu danh mục", color = OnSurfaceMuted)
                 }
             }
         }

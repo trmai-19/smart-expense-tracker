@@ -19,6 +19,9 @@ class JwtTokenAdapter : JwtTokenPort {
     @Value("\${jwt.expiration-ms}")
     private var jwtExpirationMs: Int = 0
 
+    @Value("\${jwt.refresh-expiration-ms:2592000000}")
+    private var jwtRefreshExpirationMs: Long = 2592000000
+
     private fun getSigningKey(): SecretKey {
         val keyBytes = Decoders.BASE64.decode(jwtSecret)
         return Keys.hmacShaKeyFor(keyBytes)
@@ -30,6 +33,15 @@ class JwtTokenAdapter : JwtTokenPort {
             .claim("id", user.id)
             .issuedAt(Date())
             .expiration(Date(Date().time + jwtExpirationMs))
+            .signWith(getSigningKey())
+            .compact()
+    }
+
+    override fun generateRefreshToken(user: User): String {
+        return Jwts.builder()
+            .subject(user.email)
+            .issuedAt(Date())
+            .expiration(Date(Date().time + jwtRefreshExpirationMs))
             .signWith(getSigningKey())
             .compact()
     }

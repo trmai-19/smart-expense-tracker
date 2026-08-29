@@ -2,6 +2,7 @@ package com.smartexpense.android.presentation.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.smartexpense.android.domain.usecase.chat.GetChatHistoryUseCase
 import com.smartexpense.android.domain.usecase.chat.SendChatMessageUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,8 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 class ChatViewModel(
-    private val sendChatMessageUseCase: SendChatMessageUseCase
+    private val sendChatMessageUseCase: SendChatMessageUseCase,
+    private val getChatHistoryUseCase: GetChatHistoryUseCase
 ) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
@@ -21,14 +23,30 @@ class ChatViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        // Tin nhắn chào mừng từ AI
-        _messages.value = listOf(
-            ChatMessage(
-                content = "Xin chào! Tôi là SET AI 👋\nTôi có thể giúp bạn phân tích chi tiêu, lập kế hoạch ngân sách và đưa ra lời khuyên tài chính. Bạn muốn hỏi gì?",
-                isUser = false,
-                time = currentTime()
-            )
-        )
+        // Lấy lịch sử khi mở màn hình
+        loadHistory()
+    }
+
+    private fun loadHistory() {
+        _isLoading.value = true
+        viewModelScope.launch {
+            val result = getChatHistoryUseCase.execute()
+            _isLoading.value = false
+            result.onSuccess { history ->
+                if (history.isNotEmpty()) {
+                    _messages.value = history
+                } else {
+                    // Tin nhắn chào mừng từ AI nếu chưa có lịch sử
+                    _messages.value = listOf(
+                        ChatMessage(
+                            content = "Xin chào! Tôi là SET AI 👋\nTôi có thể giúp bạn phân tích chi tiêu, lập kế hoạch ngân sách và đưa ra lời khuyên tài chính. Bạn muốn hỏi gì?",
+                            isUser = false,
+                            time = currentTime()
+                        )
+                    )
+                }
+            }
+        }
     }
 
     fun sendMessage(text: String) {

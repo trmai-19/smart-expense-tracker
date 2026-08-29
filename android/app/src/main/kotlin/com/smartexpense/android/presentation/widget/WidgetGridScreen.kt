@@ -80,7 +80,7 @@ private fun ExpenseGridCard(
     onClick: () -> Unit
 ) {
     val imageUrl = if (photoUrl.startsWith("http")) photoUrl
-                   else "${com.smartexpense.android.data.remote.RetrofitClient.BASE_URL}$photoUrl"
+                   else "${com.smartexpense.android.data.remote.RetrofitClient.BASE_URL.removeSuffix("/")}${if (photoUrl.startsWith("/")) photoUrl else "/$photoUrl"}"
 
     Box(
         modifier = Modifier

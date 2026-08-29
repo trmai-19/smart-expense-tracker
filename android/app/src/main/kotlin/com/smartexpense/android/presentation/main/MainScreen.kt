@@ -238,7 +238,8 @@ fun MainScreen(
             state = pagerState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
             userScrollEnabled = true
         ) { page ->
             Box(modifier = Modifier.fillMaxSize()) {
@@ -258,9 +259,7 @@ fun MainScreen(
                         CameraScreen(
                             verticalPagerState = verticalPagerState,
                             expenses = filtered,
-                            onCaptureConfirm = { path ->
-                                navController.navigate(Screen.Confirm.createRoute(path))
-                            }
+                            expenseViewModel = expenseViewModel
                         )
                     }
                     3 -> ChatScreen()

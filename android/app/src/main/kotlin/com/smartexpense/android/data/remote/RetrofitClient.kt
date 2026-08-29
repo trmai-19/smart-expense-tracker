@@ -28,8 +28,12 @@ object RetrofitClient {
             }
 
             val client = OkHttpClient.Builder()
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .addInterceptor(logging)
                 .addInterceptor(AuthInterceptor(tokenManager!!))
+                .authenticator(TokenAuthenticator(tokenManager!!))
                 .build()
 
             retrofit = Retrofit.Builder()
