@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">SET</string>
+    <string name="app_full_name">Smart Expense Tracker</string>
+    <string name="tagline">Smart Expense Tracker</string>
+
+    <!-- Auth -->
+    <string name="login_title">Đăng nhập</string>
+    <string name="register_title">Tạo tài khoản</string>
+    <string name="username_or_email_hint">Tên đăng nhập / Email</string>
+    <string name="display_name_hint">Tên hiển thị</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="confirm_password_hint">Xác nhận mật khẩu</string>
+    <string name="btn_login">ĐĂNG NHẬP</string>
+    <string name="btn_register">ĐĂNG KÝ</string>
+    <string name="prompt_no_account">Chưa có tài khoản? </string>
+    <string name="action_register">Đăng ký ngay</string>
+    <string name="prompt_have_account">Đã có tài khoản? </string>
+    <string name="action_login">Đăng nhập</string>
+
+    <!-- Main Navigation -->
+    <string name="nav_dashboard">Thống kê</string>
+    <string name="nav_camera">Camera</string>
+    <string name="nav_palette">Đổi màu</string>
+    <string name="palette_sheet_title">Chọn màu chủ đạo</string>
+    <string name="palette_sheet_subtitle">Tùy biến màu sắc hiển thị trên toàn bộ ứng dụng</string>
+
+    <!-- Camera / Locket -->
+    <string name="swipe_up_hint">Lướt lên để xem lịch sử ▲</string>
+    <string name="caption_overlay_hint">Viết caption...</string>
+    <string name="btn_retake">Chụp lại</string>
+    <string name="btn_post">ĐĂNG</string>
+    <string name="post_success">Đã ghi nhận chi tiêu thành công!</string>
+
+    <!-- History / Widget -->
+    <string name="history_title">Lịch sử chi tiêu</string>
+    <string name="empty_history">Chưa có khoản chi nào được ghi lại</string>
+    <string name="action_download">Lưu ảnh</string>
+    <string name="action_share">Chia sẻ</string>
+    <string name="action_delete">Xóa</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Thống kê</string>
+    <string name="monthly_spent_label">Tổng chi tháng này</string>
+    <string name="sample_monthly_spent">1.250.000 ₫</string>
+    <string name="category_breakdown_title">Phân loại chi tiêu</string>
+    <string name="recent_trend_title">Xu hướng 7 ngày gần đây</string>
+    <string name="weekly_trend_title">Xu hướng 7 ngày gần đây</string>
+    <string name="filter_this_month">Tháng 8 / 2026 ▼</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Hồ sơ cá nhân</string>
+    <string name="default_user_name">Nguyễn Văn A</string>
+    <string name="default_user_email">user@smartexpense.com</string>
+    <string name="profile_edit_info">Chỉnh sửa hồ sơ</string>
+    <string name="profile_theme_color">Màu chủ đạo (Accent Color)</string>
+    <string name="profile_notifications">Thông báo</string>
+    <string name="profile_about">Về ứng dụng</string>
+    <string name="profile_logout">Đăng xuất</string>
+    <string name="theme_color_applied">Đã cập nhật màu chủ đạo</string>
+
+    <!-- Chatbot -->
+    <string name="chat_title">Trợ lý SET AI</string>
+    <string name="chat_hint">Hỏi trợ lý về chi tiêu của bạn...</string>
+    <string name="bot_welcome_message">Xin chào! Tôi là Trợ lý SET. Bạn có thể hỏi tôi về các khoản chi tiêu, thống kê hoặc dự báo tài chính tháng này!</string>
+    <string name="sample_user_message">Tháng này tôi đã chi bao nhiêu tiền ăn uống?</string>
+    <string name="sample_bot_reply">Tháng này bạn đã chi 562.500 ₫ cho Ăn uống (chiếm 45% tổng chi tiêu). Bạn còn khoảng 600.000 ₫ trong ngân sách ăn uống dự kiến.</string>
+
+    <!-- Generic -->
+    <string name="currency_vnd">₫</string>
+    <string name="placeholder_feature_title">Sắp ra mắt</string>
+    <string name="placeholder_feature_desc">Tính năng đang được phát triển. Hãy đón chờ ở bản cập nhật tiếp theo!</string>
+</resources>

@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Top clockwise curved rotation arrow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,4V1L7.5,5.5 12,10V7c3.31,0 6,2.69 6,6 0,1.17 -0.34,2.26 -0.92,3.18l1.48,1.48C19.46,16.29 20,14.72 20,13c0,-4.42 -3.58,-8 -8,-8z" />
+
+    <!-- Bottom clockwise curved rotation arrow -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,17c-3.31,0 -6,-2.69 -6,-6 0,-1.17 0.34,-2.26 0.92,-3.18L5.44,6.34C4.54,7.71 4,9.28 4,11c0,4.42 3.58,8 8,8v3l4.5,-4.5L12,13v4z" />
+
+
+</vector>

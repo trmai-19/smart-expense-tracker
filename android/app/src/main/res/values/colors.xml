@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background & Surface (OLED Dark Mode) -->
+    <color name="bg_main">#0D0D0D</color>
+    <color name="bg_surface">#1A1A1A</color>
+    <color name="bg_surface_elevated">#262626</color>
+    <color name="bg_surface_card">#1E1E1E</color>
+    <color name="bg_overlay_dark">#99000000</color>
+    <color name="bg_overlay_semi">#66000000</color>
+
+    <!-- Ultra-Vibrant Neon Accent Colors (High Contrast on OLED Dark) -->
+    <color name="accent_neon_lime">#00FF87</color>     <!-- Neon Lime Green -->
+    <color name="accent_neon_cyan">#00F0FF</color>     <!-- Neon Cyan Blue -->
+    <color name="accent_neon_yellow">#FFE600</color>   <!-- Neon Cyber Yellow -->
+    <color name="accent_neon_pink">#FF80BF</color>     <!-- Soft Glowing Pastel Neon Pink -->
+    <color name="accent_neon_purple">#C77DFF</color>   <!-- Bright Luminous Neon Lilac/Purple -->
+    <color name="accent_neon_orange">#FF6B00</color>   <!-- Neon Blaze Orange -->
+    <color name="accent_neon_mint">#00FFCC</color>     <!-- Neon Aqua Mint -->
+    <color name="accent_neon_coral">#FF3366</color>    <!-- Neon Coral Red -->
+
+    <!-- Legacy / Alias Accent Names (Mapped to Glowing Neon Colors) -->
+    <color name="accent_gold">#FFE600</color>
+    <color name="accent_green">#00FF87</color>
+    <color name="accent_blue">#00F0FF</color>
+    <color name="accent_purple">#C77DFF</color>
+    <color name="accent_pink">#FF80BF</color>
+    <color name="accent_orange">#FF6B00</color>
+
+    <!-- Default Primary Accent (Neon Cyber Yellow) -->
+    <color name="primary_accent">#FFE600</color>
+    <color name="primary_accent_variant">#FFD000</color>
+    <color name="on_primary_accent">#000000</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#AAAAAA</color>
+    <color name="text_tertiary">#666666</color>
+    <color name="text_hint">#555555</color>
+
+    <!-- Functional & Status -->
+    <color name="status_danger">#FF5252</color>
+    <color name="status_success">#00FF87</color>
+    <color name="status_warning">#FFB74D</color>
+    <color name="status_info">#00F0FF</color>
+
+    <!-- UI Elements -->
+    <color name="divider_color">#2A2A2A</color>
+    <color name="input_background">#1F1F1F</color>
+    <color name="input_border">#333333</color>
+    <color name="shutter_button_outer">#FFFFFF</color>
+    <color name="shutter_button_inner">#E0E0E0</color>
+    <color name="bot_bubble">#222222</color>
+    <color name="nav_bar_bg">#121212</color>
+    <color name="transparent">#00000000</color>
+    <color name="ripple_light">#20FFFFFF</color>
+    <color name="ripple_dark">#33000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+</resources>
